@@ -3,24 +3,30 @@
 use Seek\Exceptions\InvalidArgumentException;
 
 /**
- * Phone value object
+ * Contact value object
  */
 final class Contact implements ValueObjectInterface
 {
     /**
+     * Name of contact person.
+     *
      * @var string
      */
-    protected $name;
+    private $name;
 
     /**
+     * Contact phone number.
+     *
      * @var string
      */
-    protected $phone;
+    private $phone;
 
     /**
+     * Contact email address.
+     *
      * @var string
      */
-    protected $email;
+    private $email;
 
     /**
      * @param string $name
@@ -106,8 +112,9 @@ final class Contact implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'name'  => $this->getName(),
+            'phone' => $this->getPhone(),
+            'email' => $this->getEmail(),
         ];
     }
 }

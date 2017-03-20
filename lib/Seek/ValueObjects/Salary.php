@@ -1,32 +1,39 @@
 <?php namespace Seek\ValueObjects;
 
-use Seek\Exceptions\InvalidArgumentException;
 use Seek\Enums\SalaryType;
+use Seek\Exceptions\InvalidArgumentException;
 
 /**
- * Phone value object
+ * Salary value object
  */
 final class Salary implements ValueObjectInterface
 {
     /**
      * @var SalaryType
      */
-    protected $type;
+    private $type;
 
     /**
+     * Minimum salary of the salary range applicable to the job advertisement.
+     *
      * @var float
      */
-    protected $minimum;
+    private $minimum;
 
     /**
+     * Maximum salary of the salary range applicable to the job advertisement.
+     *
      * @var float
      */
-    protected $maximum;
+    private $maximum;
 
     /**
+     * Optional string used to specify salary information for display to candidates [limited to 50 characters].
+     * No formatting tags are allowed e.g. < b >Bold< /b >, < br >, etc.
+     *
      * @var string
      */
-    protected $details;
+    private $details;
 
     /**
      * @param SalaryType $type
@@ -36,8 +43,10 @@ final class Salary implements ValueObjectInterface
      */
     public function __construct(SalaryType $type, $minimum, $maximum, $details = null)
     {
-        $this->setType($id);
-        $this->setAreaId($areaId);
+        $this->setType($type);
+        $this->setMinimum($minimum);
+        $this->setMaximum($maximum);
+        $this->setDetails($details);
     }
 
     /**
@@ -57,24 +66,69 @@ final class Salary implements ValueObjectInterface
     }
 
     /**
-     * @param string $areaId
+     * @param float $minimum
      * @throws InvalidArgumentException
      */
-    private function setAreaId($areaId)
+    private function setMinimum($minimum)
     {
-        if ($areaId !== null && !is_string($areaId)) {
-            throw new InvalidArgumentException('Location area id must be a string');
+        if (!is_float($minimum) && !is_int($minimum)) {
+            throw new InvalidArgumentException('Salary minimum amount must be a numeric value');
         }
 
-        $this->areaId = $areaId;
+        $this->minimum = $minimum;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMinimum()
+    {
+        return $this->minimum;
+    }
+
+    /**
+     * @param float $maximum
+     * @throws InvalidArgumentException
+     */
+    private function setMaximum($maximum)
+    {
+        if (!is_float($maximum) && !is_int($maximum)) {
+            throw new InvalidArgumentException('Salary maximum amount must be a numeric value');
+        }
+
+        $this->maximum = $maximum;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaximum()
+    {
+        return $this->maximum;
+    }
+
+    /**
+     * @param string $details
+     * @throws InvalidArgumentException
+     */
+    private function setDetails($details)
+    {
+        if ($details !== null && !is_string($details)) {
+            throw new InvalidArgumentException('Salary description must be a string');
+        }
+
+        if (strlen($details) > 50) {
+            throw new InvalidArgumentException('Salary description must be no more than 50 characters long');
+        }
+        $this->details = $details;
     }
 
     /**
      * @return string
      */
-    public function getAreaId()
+    public function getDetails()
     {
-        return $this->areaId;
+        return $this->details;
     }
 
     /**
@@ -83,8 +137,10 @@ final class Salary implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'type'    => $this->getType()->getValue(),
+            'minimum' => $this->getMinimum(),
+            'maximum' => $this->getMaximum(),
+            'details' => $this->getDetails(),
         ];
     }
 }

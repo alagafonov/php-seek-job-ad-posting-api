@@ -10,14 +10,14 @@
          syntaxCheck="false"
          bootstrap="tests/bootstrap.php">
     <testsuites>
-        <testsuite name="php-trademe-jobs-api Test Suite">
-            <directory>./tests/Trademe/</directory>
+        <testsuite name="php-seek-job-ad-posting-api Test Suite">
+            <directory>./tests/Seek/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory suffix=".php">./lib/Trademe/</directory>
+            <directory suffix=".php">./lib/Seek/</directory>
         </whitelist>
     </filter>
 

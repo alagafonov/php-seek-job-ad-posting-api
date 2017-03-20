@@ -1,71 +1,63 @@
 <?php namespace Seek\ValueObjects;
 
+use Seek\Enums\Location as LocationCode;
+use Seek\Enums\LocationArea;
 use Seek\Exceptions\InvalidArgumentException;
 
 /**
- * Phone value object
+ * Location value object
  */
 final class Location implements ValueObjectInterface
 {
     /**
-     * @var string
+     * @var LocationCode
      */
-    protected $id;
+    private $id;
 
     /**
-     * @var string
+     * @var LocationArea
      */
-    protected $areaId;
+    private $areaId;
 
     /**
-     * @param string $id
-     * @param string $areaId
+     * @param LocationCode $id
+     * @param LocationArea|null $areaId
      * @throws InvalidArgumentException
      */
-    public function __construct($id, $areaId = null)
+    public function __construct(LocationCode $id, LocationArea $areaId = null)
     {
         $this->setId($id);
         $this->setAreaId($areaId);
     }
 
     /**
-     * @param string $id
+     * @param LocationCode $id
      * @throws InvalidArgumentException
      */
-    private function setId($id)
+    private function setId(LocationCode $id)
     {
-        if (!is_string($id)) {
-            throw new InvalidArgumentException('Location id must be a string');
-        }
-
-        if (!$id) {
-            throw new InvalidArgumentException('Location id cannot be empty');
-        }
+        $this->id = $id;
     }
 
     /**
-     * @return string
+     * @return LocationCode
      */
     public function getId()
     {
-        return $this->advertiserId;
+        return $this->id;
     }
 
     /**
-     * @param string $areaId
+     * @param LocationArea $areaId
      * @throws InvalidArgumentException
      */
-    private function setAreaId($areaId)
+    private function setAreaId($areaId = null)
     {
-        if ($areaId !== null && !is_string($areaId)) {
-            throw new InvalidArgumentException('Location area id must be a string');
-        }
-
         $this->areaId = $areaId;
     }
 
     /**
-     * @return string
+     * @return LocationArea
      */
     public function getAreaId()
     {
@@ -78,8 +70,8 @@ final class Location implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'id'     => $this->getId()->getValue(),
+            'areaId' => $this->getAreaId()->getValue(),
         ];
     }
 }

@@ -179,8 +179,17 @@ class Advertisement extends Entity
     protected $graduate = false;
 
     /**
-     * @param int $id
+     * @param string $id
      * @param ThirdParties $thirdParties
+     * @param AdvertisementType $advertisementType
+     * @param string $jobTitle
+     * @param Location $location
+     * @param SubClassification $subClassification
+     * @param WorkType $workType
+     * @param Salary $salary
+     * @param string $jobSummary
+     * @param string $advertisementDetails
+     * @param Recruiter $recruiter
      * @throws InvalidArgumentException
      */
     public function __construct(
@@ -193,11 +202,21 @@ class Advertisement extends Entity
         WorkType $workType,
         Salary $salary,
         $jobSummary,
-        $advertisementDetails
+        $advertisementDetails,
+        Recruiter $recruiter
 
     ) {
         parent::__construct($id);
         $this->setThirdParties($thirdParties);
+        $this->setAdvertisementType($advertisementType);
+        $this->setJobTitle($jobTitle);
+        $this->setLocation($location);
+        $this->setSubClassification($subClassification);
+        $this->setWorkType($workType);
+        $this->setSalary($salary);
+        $this->setJobSummary($jobSummary);
+        $this->setAdvertisementDetails($advertisementDetails);
+        $this->setRecruiter($recruiter);
     }
 
     /**

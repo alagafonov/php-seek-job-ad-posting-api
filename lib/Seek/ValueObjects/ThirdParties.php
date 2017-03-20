@@ -3,19 +3,24 @@
 use Seek\Exceptions\InvalidArgumentException;
 
 /**
- * Phone value object
+ * Third parties value object
  */
 final class ThirdParties implements ValueObjectInterface
 {
     /**
+     * Identity of the Client that this Advertisement is being posted for
+     *
      * @var string
      */
-    protected $advertiserId;
+    private $advertiserId;
 
     /**
+     * Identity of the agent that is creating or updating an advertisement on behalf of an advertiser when the
+     * agent is posting the advertisement using a third party uploader
+     *
      * @var string
      */
-    protected $agentId;
+    private $agentId;
 
     /**
      * @param string $advertiserId
@@ -41,6 +46,7 @@ final class ThirdParties implements ValueObjectInterface
         if (!$advertiserId) {
             throw new InvalidArgumentException('Advertisement id cannot be empty');
         }
+        $this->advertiserId = $advertiserId;
     }
 
     /**

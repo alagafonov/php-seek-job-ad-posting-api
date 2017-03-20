@@ -1,7 +1,7 @@
 <?php namespace Seek\ValueObjects;
 
-use Seek\Exceptions\InvalidArgumentException;
 use Seek\Enums\Position;
+use Seek\Exceptions\InvalidArgumentException;
 
 /**
  * Video value object
@@ -9,14 +9,16 @@ use Seek\Enums\Position;
 final class Video implements ValueObjectInterface
 {
     /**
+     * Full 'embed' link including object tags as displayed on YouTube
+     *
      * @var string
      */
-    protected $url;
+    private $url;
 
     /**
      * @var Position
      */
-    protected $position;
+    private $position;
 
     /**
      * @param string $url
@@ -37,6 +39,10 @@ final class Video implements ValueObjectInterface
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException('Video URL format is invalid');
+        }
+
+        if (strlen($url) > 255) {
+            throw new InvalidArgumentException('Video URL must be no more than 50 characters long');
         }
         $this->url = $url;
     }
@@ -59,7 +65,7 @@ final class Video implements ValueObjectInterface
     }
 
     /**
-     * @return string
+     * @return Position
      */
     public function getPosition()
     {
@@ -72,8 +78,8 @@ final class Video implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'url'      => $this->getUrl(),
+            'position' => $this->getPosition()->getValue(),
         ];
     }
 }
