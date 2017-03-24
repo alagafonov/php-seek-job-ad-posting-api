@@ -1,5 +1,5 @@
 <?php namespace Seek\Exceptions;
 
-class BadRequestException extends TrademeException
+class BadRequestException extends SeekException
 {
 }

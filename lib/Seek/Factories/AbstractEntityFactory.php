@@ -1,6 +1,6 @@
-<?php namespace Trademe\Factories;
+<?php namespace Seek\Factories;
 
-use Trademe\Entities\Entity;
+use Seek\Entities\Entity;
 
 /**
  * Abstract factory

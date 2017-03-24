@@ -5,6 +5,7 @@ use Seek\Enums\SubClassification;
 use Seek\Enums\WorkType;
 use Seek\Exceptions\InvalidArgumentException;
 use Seek\ValueObjects\Contact;
+use Seek\ValueObjects\Location;
 use Seek\ValueObjects\Recruiter;
 use Seek\ValueObjects\Salary;
 use Seek\ValueObjects\StandOut;
@@ -277,7 +278,7 @@ class Advertisement extends Entity
             throw new InvalidArgumentException('Job title must be a string');
         }
 
-        if ($jobTitle) {
+        if (!$jobTitle) {
             throw new InvalidArgumentException('Job title cannot be empty');
         }
 
@@ -305,7 +306,7 @@ class Advertisement extends Entity
             throw new InvalidArgumentException('Job summary must be a string');
         }
 
-        if ($jobSummary) {
+        if (!$jobSummary) {
             throw new InvalidArgumentException('Job summary cannot be empty');
         }
 
@@ -320,7 +321,7 @@ class Advertisement extends Entity
      */
     public function getJobSummary()
     {
-        return $this->jobTitle;
+        return $this->jobSummary;
     }
 
     /**
@@ -333,12 +334,12 @@ class Advertisement extends Entity
             throw new InvalidArgumentException('Advertisement details must be a string');
         }
 
-        if ($advertisementDetails) {
+        if (!$advertisementDetails) {
             throw new InvalidArgumentException('Advertisement details cannot be empty');
         }
 
         if (strlen($advertisementDetails) > 20000) {
-            throw new InvalidArgumentException('Advertisement details must be no more than 150 characters long');
+            throw new InvalidArgumentException('Advertisement details must be no more than 20000 characters long');
         }
         $this->advertisementDetails = $advertisementDetails;
     }
@@ -362,7 +363,7 @@ class Advertisement extends Entity
             throw new InvalidArgumentException('Search job title must be a string');
         }
 
-        if ($searchJobTitle) {
+        if (!$searchJobTitle) {
             throw new InvalidArgumentException('Search job title cannot be empty');
         }
 
@@ -512,7 +513,7 @@ class Advertisement extends Entity
     public function setEndApplicationUrl($endApplicationUrl)
     {
         if ($endApplicationUrl !== null && !filter_var($endApplicationUrl, FILTER_VALIDATE_URL)) {
-            throw new InvalidArgumentException('End application form URL format is invalid');
+            throw new InvalidArgumentException('End application URL format is invalid');
         }
         $this->endApplicationUrl = $endApplicationUrl;
     }
@@ -522,7 +523,7 @@ class Advertisement extends Entity
      */
     public function getEndApplicationUrl()
     {
-        return $this->applicationFormUrl;
+        return $this->endApplicationUrl;
     }
 
     /**
@@ -575,6 +576,14 @@ class Advertisement extends Entity
             throw new InvalidArgumentException('Agent job reference must be a string');
         }
         $this->agentJobReference = $agentJobReference;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAgentJobReference()
+    {
+        return $this->agentJobReference;
     }
 
     /**
@@ -631,7 +640,7 @@ class Advertisement extends Entity
      */
     public function setResidentsOnly($residentsOnly)
     {
-        if (!is_bool($residentsOnly)) {
+        if ($residentsOnly !== null && !is_bool($residentsOnly)) {
             throw new InvalidArgumentException('Residents only flag must be a boolean value');
         }
         $this->residentsOnly = $residentsOnly;
@@ -651,8 +660,8 @@ class Advertisement extends Entity
      */
     public function setGraduate($graduate)
     {
-        if (!is_bool($graduate)) {
-            throw new InvalidArgumentException('Residents only flag must be a boolean value');
+        if ($graduate !== null && !is_bool($graduate)) {
+            throw new InvalidArgumentException('Graduates flag must be a boolean value');
         }
         $this->graduate = $graduate;
     }
@@ -665,130 +674,42 @@ class Advertisement extends Entity
         return $this->graduate;
     }
 
-
     /**
      * @return array
      */
     public function getArray()
     {
-        $attributes = [
-            [
-                'Name'  => 'JobDistrict',
-                'Value' => $this->getJobDistrict()->getValue(),
-            ],
-            [
-                'Name'  => 'JobType',
-                'Value' => $this->getJobType()->getValue(),
-            ],
-            [
-                'Name'  => 'PayType',
-                'Value' => $this->getPayType()->getValue(),
-            ],
-            [
-                'Name'  => 'PreferredApplicationMode',
-                'Value' => $this->getPreferredApplicationMode()->getValue(),
-            ],
-            [
-                'Name'  => 'ContactName',
-                'Value' => $this->getContactName(),
-            ],
-            [
-                'Name'  => 'EmailAddress',
-                'Value' => $this->getEmailAddress(),
-            ],
-            [
-                'Name'  => 'ApplicationUrl',
-                'Value' => $this->getApplicationUrl(),
-            ],
-            [
-                'Name'  => 'Company',
-                'Value' => $this->getCompany(),
-            ],
-            [
-                'Name'  => 'PayAndBenefits',
-                'Value' => $this->getPayAndBenefits(),
-            ],
-            [
-                'Name'  => 'ApplicationInstructions',
-                'Value' => $this->getApplicationInstructions(),
-            ],
-            [
-                'Name'  => 'ContractDuration',
-                'Value' => 'PER',
-            ],
-        ];
-
-        $salaryRange = $this->getSalaryRange();
-        if ($salaryRange !== null) {
-            $attributes = array_merge($attributes, $salaryRange->getArray());
+        $additionalProperties = [];
+        if ($this->getResidentsOnly()) {
+            $additionalProperties[] = 'ResidentsOnly';
         }
-
-        $hourlyRateRange = $this->getHourlyRateRange();
-        if ($hourlyRateRange !== null) {
-            $attributes = array_merge($attributes, $hourlyRateRange->getArray());
+        if ($this->getGraduate()) {
+            $additionalProperties[] = 'Graduate';
         }
-
-        $phone1 = $this->getPhone1();
-        if ($phone1 !== null) {
-            $attributes[] = [
-                'Name'  => 'Phone1Prefix',
-                'Value' => $phone1->getPrefix(),
-            ];
-            $attributes[] = [
-                'Name'  => 'Phone1Number',
-                'Value' => $phone1->getPhone(),
-            ];
-        }
-
-        $phone2 = $this->getPhone2();
-        if ($phone2 !== null) {
-            $attributes[] = [
-                'Name'  => 'Phone2Prefix',
-                'Value' => $phone2->getPrefix(),
-            ];
-            $attributes[] = [
-                'Name'  => 'Phone2Number',
-                'Value' => $phone2->getPhone(),
-            ];
-        }
-
-        $brandingBanner = $this->getBrandingBanner();
-        $brandingLogo = $this->getBrandingLogo();
-        $isBranded = false;
-        if ($brandingBanner !== null || $brandingLogo !== null) {
-            $isBranded = true;
-            $attributes[] = [
-                'Name'  => 'Branding',
-                'Value' => true,
-            ];
-            $attributes[] = [
-                'Name'  => 'BrandingBanner',
-                'Value' => $brandingBanner,
-            ];
-            $attributes[] = [
-                'Name'  => 'BrandingLogo',
-                'Value' => $brandingLogo,
-            ];
-        }
-
         return [
-            'ListingId'            => $this->getId(),
-            'Category'             => $this->getCategory(),
-            'Title'                => $this->getTitle(),
-            'ShortDescription'     => $this->getShortDescription(),
-            'Description'          => [
-                $this->getDescription(),
-            ],
-            'Duration'             => $this->duration,
-            'ExternalReferenceId'  => $this->getExternalReferenceId(),
-            'EmbeddedContent'      => [
-                'YouTubeVideoKey' => $this->getYouTubeVideoKey(),
-            ],
-            'IsBranded'            => $isBranded,
-            'IsClassified'         => true,
-            'ReturnListingDetails' => false,
-            'PhotoIds'             => $this->getPhotos(),
-            'Attributes'           => $attributes,
+            'thirdParties'         => $this->getThirdParties()->getArray(),
+            'advertisementType'    => $this->getAdvertisementType()->getValue(),
+            'jobTitle'             => $this->getJobTitle(),
+            'searchJobTitle'       => $this->getSearchJobTitle(),
+            'location'             => $this->getLocation()->getArray(),
+            'subclassificationId'  => $this->getSubClassification()->getValue(),
+            'workType'             => $this->getWorkType()->getValue(),
+            'salary'               => $this->getSalary()->getArray(),
+            'jobSummary'           => $this->getJobSummary(),
+            'advertisementDetails' => $this->getAdvertisementDetails(),
+            'contact'              => $this->getContact()->getArray(),
+            'video'                => $this->getVideo()->getArray(),
+            'applicationEmail'     => $this->getApplicationEmail(),
+            'applicationFormUrl'   => $this->getApplicationFormUrl(),
+            'endApplicationUrl'    => $this->getEndApplicationUrl(),
+            'screenId'             => $this->getScreenId(),
+            'jobReference'         => $this->getJobReference(),
+            'agentJobReference'    => $this->getAgentJobReference(),
+            'template'             => $this->getTemplate()->getArray(),
+            'standout'             => $this->getStandOut()->getArray(),
+            'recruiter'            => $this->getRecruiter()->getArray(),
+            'additionalProperties' => $additionalProperties,
+            'creationId'           => $this->getId(),
         ];
     }
 }

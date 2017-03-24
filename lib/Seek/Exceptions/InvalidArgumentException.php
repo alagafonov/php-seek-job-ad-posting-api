@@ -1,5 +1,5 @@
 <?php namespace Seek\Exceptions;
 
-class InvalidArgumentException extends TrademeException
+class InvalidArgumentException extends SeekException
 {
 }

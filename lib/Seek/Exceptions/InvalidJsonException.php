@@ -1,5 +1,5 @@
 <?php namespace Seek\Exceptions;
 
-class InvalidJsonException extends TrademeException
+class InvalidJsonException extends SeekException
 {
 }

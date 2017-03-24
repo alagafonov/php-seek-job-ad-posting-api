@@ -43,7 +43,7 @@ class VideoTest extends SeekTestCase
         $position = $video->getPosition();
 
         $this->assertInstanceOf('Seek\Enums\Position', $position);
-        $this->assertEquals($data['position'], $video->getPosition());
+        $this->assertEquals($data['position'], $video->getPosition()->getValue());
 
         $data['position'] = null;
         $video = $this->createVideo($data);

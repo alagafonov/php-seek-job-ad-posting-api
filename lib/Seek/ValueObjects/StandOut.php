@@ -1,30 +1,37 @@
 <?php namespace Seek\ValueObjects;
 
 use Seek\Exceptions\InvalidArgumentException;
+use Seek\Exceptions\ValidationException;
 
 /**
- * Video value object
+ * Stand out value object
  */
 final class StandOut implements ValueObjectInterface
 {
     /**
      * @var integer
      */
-    protected $logoId;
+    private $logoId;
 
     /**
      * @var string[]
      */
-    protected $bullets;
+    private $bullets = [];
 
     /**
      * @param integer $logoId
      * @param string[] $bullets
      * @throws InvalidArgumentException
+     * @throws ValidationException
      */
-    public function __construct($logoId, array $bullets = [])
+    public function __construct($logoId, array $bullets)
     {
         $this->setLogoId($logoId);
+
+        if (sizeof($bullets) > 3) {
+            throw new ValidationException('Stand out ads can only have up to 3 bullet points');
+        }
+
         if (!empty($bullets)) {
             foreach ($bullets as $bullet) {
                 $this->addBullet($bullet);
@@ -56,7 +63,7 @@ final class StandOut implements ValueObjectInterface
      * @param string $bullet
      * @throws InvalidArgumentException
      */
-    public function addBullet($bullet)
+    private function addBullet($bullet)
     {
         if (!is_string($bullet)) {
             throw new InvalidArgumentException('Stand out bullet point must be a string');
@@ -78,8 +85,8 @@ final class StandOut implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'logoId'  => $this->getLogoId(),
+            'bullets' => $this->getBullets(),
         ];
     }
 }

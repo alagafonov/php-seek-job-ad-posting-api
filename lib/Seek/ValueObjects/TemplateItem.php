@@ -3,19 +3,23 @@
 use Seek\Exceptions\InvalidArgumentException;
 
 /**
- * Video value object
+ * Template item value object
  */
 final class TemplateItem implements ValueObjectInterface
 {
     /**
+     * The custom template field name.
+     *
      * @var string
      */
-    protected $name;
+    private $name;
 
     /**
+     * The custom template field value.
+     *
      * @var string
      */
-    protected $value;
+    private $value;
 
     /**
      * @param string $name
@@ -35,11 +39,11 @@ final class TemplateItem implements ValueObjectInterface
     private function setName($name)
     {
         if (!is_string($name)) {
-            throw new InvalidArgumentException('Contact name must be a string');
+            throw new InvalidArgumentException('Template item name must be a string');
         }
 
         if (!$name) {
-            throw new InvalidArgumentException('Contact name cannot be empty');
+            throw new InvalidArgumentException('Template item name cannot be empty');
         }
         $this->name = $name;
     }
@@ -82,8 +86,8 @@ final class TemplateItem implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'name'  => $this->getName(),
+            'value' => $this->getValue(),
         ];
     }
 }

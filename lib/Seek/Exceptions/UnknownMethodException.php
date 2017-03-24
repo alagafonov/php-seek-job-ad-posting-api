@@ -1,5 +1,5 @@
 <?php namespace Seek\Exceptions;
 
-class UnknownMethodException extends TrademeException
+class UnknownMethodException extends SeekException
 {
 }

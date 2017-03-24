@@ -3,24 +3,32 @@
 use Seek\Exceptions\InvalidArgumentException;
 
 /**
- * Phone value object
+ * Recruiter value object
  */
 final class Recruiter implements ValueObjectInterface
 {
     /**
+     * The first name and surname separated by a space of recruiter who is responsible for the job ad and handling
+     * the recruitment of the position.
+     *
      * @var string
      */
-    protected $fullName;
+    private $fullName;
 
     /**
+     * The email address of recruiter who is responsible for the job ad and handling the recruitment of the position.
+     *
      * @var string
      */
-    protected $email;
+    private $email;
 
     /**
+     * The team name of recruiter who is responsible for the job ad and handling the recruitment of the position is
+     * part of.
+     *
      * @var string
      */
-    protected $teamName;
+    private $teamName;
 
     /**
      * @param string $fullName
@@ -106,8 +114,9 @@ final class Recruiter implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'fullName' => $this->getFullName(),
+            'email'    => $this->getEmail(),
+            'teamName' => $this->getTeamName(),
         ];
     }
 }

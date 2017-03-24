@@ -3,31 +3,31 @@
 use Seek\Exceptions\InvalidArgumentException;
 
 /**
- * Video value object
+ * Template value object
  */
 final class Template implements ValueObjectInterface
 {
     /**
      * @var integer
      */
-    protected $id;
+    private $id;
 
     /**
-     * @var []TemplateItem
+     * @var TemplateItem[]
      */
-    protected $items;
+    private $items = [];
 
     /**
      * @param string $id
-     * @param []TemplateItem $items
+     * @param TemplateItem[] $items
      * @throws InvalidArgumentException
      */
-    public function __construct($id, array $items = [])
+    public function __construct($id, array $items)
     {
         $this->setId($id);
         if (!empty($items)) {
             foreach ($items as $item) {
-                $this->addTemplateItem($item);
+                $this->addItem($item);
             }
         }
     }
@@ -56,15 +56,15 @@ final class Template implements ValueObjectInterface
      * @param TemplateItem $item
      * @throws InvalidArgumentException
      */
-    public function addTemplateItem(TemplateItem $item)
+    public function addItem(TemplateItem $item)
     {
         $this->items[] = $item;
     }
 
     /**
-     * @return string
+     * @return TemplateItem[]
      */
-    public function getTemplateItems()
+    public function getItems()
     {
         return $this->items;
     }
@@ -74,9 +74,16 @@ final class Template implements ValueObjectInterface
      */
     public function getArray()
     {
+        $items = $this->getItems();
+        $itemsArray = [];
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $itemsArray[] = $item->getArray();
+            }
+        }
         return [
-            'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
+            'id'    => $this->getId(),
+            'items' => $itemsArray,
         ];
     }
 }

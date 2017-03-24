@@ -1,5 +1,5 @@
 <?php namespace Seek\Exceptions;
 
-class NotFoundException extends TrademeException
+class NotFoundException extends SeekException
 {
 }
