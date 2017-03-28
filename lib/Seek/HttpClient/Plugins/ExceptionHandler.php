@@ -3,9 +3,12 @@
 use Http\Client\Common\Plugin;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Seek\Exceptions\BadRequestException;
-use Seek\Exceptions\NotFoundException;
 use Seek\Exceptions\ApiErrorException;
+use Seek\Exceptions\BadRequestException;
+use Seek\Exceptions\ForbiddenException;
+use Seek\Exceptions\NotFoundException;
+use Seek\Exceptions\UnauthorizedException;
+use Seek\Exceptions\UnprocessableEntityException;
 use Seek\HttpClient\Utilities\Response;
 
 /**
@@ -25,20 +28,24 @@ class ExceptionHandler implements Plugin
             function (ResponseInterface $response) use ($request) {
                 $statusCode = $response->getStatusCode();
                 $content = Response::getContent($response);
-                //echo $statusCode.' : '.$response->getBody()->__toString(); exit;
+                $error = isset($content['errors']) ? $content['errors'][0]['message'] : null;
+                //print_r($content);
+                //echo $statusCode . ' : ' . $response->getBody()->__toString();
+                //exit;
                 if ($statusCode < 400 || $statusCode > 600) {
-                    if (array_key_exists('Success', $content) && !$content['Success']) {
-                        throw new ApiErrorException($content['Description']);
-                    }
                     return $response;
+                } elseif ($statusCode == 400) {
+                    throw new BadRequestException(empty($content['message']) ? 'Bad request' : $content['message']);
+                } elseif ($statusCode == 401) {
+                    throw new UnauthorizedException($error === null ? 'Unauthorized' : $error);
+                } elseif ($statusCode == 403) {
+                    throw new ForbiddenException($error === null ? 'Forbidden' : $error);
                 } elseif ($statusCode == 404) {
                     throw new NotFoundException('Resource not found');
-                } elseif ($statusCode == 400) {
-                    throw new BadRequestException($content['error_description']);
+                } elseif ($statusCode == 422) {
+                    throw new UnprocessableEntityException($error === null ? 'Unprocessable entity' : $error);
                 }
-                throw new ApiErrorException(
-                    isset($content['error_description']) ? $content['error_description'] : 'Unknown server error'
-                );
+                throw new ApiErrorException($error === null ? 'Unknown server error' : $error);
             }
         );
     }

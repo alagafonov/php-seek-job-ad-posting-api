@@ -73,13 +73,18 @@ class ThirdPartiesTest extends SeekTestCase
         $thirdParties = $this->createThirdParties($data);
 
         $this->assertSame($data, $thirdParties->getArray());
+
+        unset($data['agentId']);
+        $thirdParties = $this->createThirdParties($data);
+
+        $this->assertSame($data, $thirdParties->getArray());
     }
 
     private function createThirdParties($data)
     {
         return new ThirdParties(
             $data['advertiserId'],
-            $data['agentId']
+            isset($data['agentId']) ? $data['agentId'] : null
         );
     }
 

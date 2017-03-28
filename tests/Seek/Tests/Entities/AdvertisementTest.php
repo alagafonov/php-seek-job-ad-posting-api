@@ -1,7 +1,9 @@
 <?php namespace Seek\Tests\Entities;
 
+use DateTime;
 use Seek\Factories\AdvertisementFactory;
 use Seek\Tests\SeekTestCase;
+use Seek\Enums\AdvertisementState;
 
 
 class AdvertisementTest extends SeekTestCase
@@ -477,12 +479,94 @@ class AdvertisementTest extends SeekTestCase
         $this->assertSame(null, $advertisement->getGraduate());
     }
 
+    /**
+     * @expectedException \Seek\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Creation id must be a string
+     */
+    public function testSetInvalidCreationId()
+    {
+        $data = $this->getAdvertisementData();
+        $data['creationId'] = 43.2;
+        $this->createAdvertisement($data);
+    }
+
+    public function testSetCreationId()
+    {
+        $data = $this->getAdvertisementData();
+        $advertisement = $this->createAdvertisement($data);
+
+        $this->assertEquals($data['creationId'], $advertisement->getCreationId());
+
+        $advertisement->setCreationId(null);
+
+        $this->assertEquals(null, $advertisement->getCreationId());
+    }
+
+    /**
+     * @expectedException \Seek\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Id must be a string
+     */
+    public function testSetInvalidId()
+    {
+        $data = $this->getAdvertisementData();
+        $advertisement = $this->createAdvertisement($data);
+        $advertisement->setId([]);
+    }
+
+    public function testSetId()
+    {
+        $id = 'test-id';
+        $data = $this->getAdvertisementData();
+        $advertisement = $this->createAdvertisement($data);
+        $advertisement->setId($id);
+
+        $this->assertEquals($id, $advertisement->getId());
+
+        $advertisement->setId(null);
+
+        $this->assertNull($advertisement->getId());
+    }
+
+    public function testSetExpiryDate()
+    {
+        $dateTime = new DateTime();
+        $data = $this->getAdvertisementData();
+        $advertisement = $this->createAdvertisement($data);
+        $advertisement->setExpiryDate($dateTime);
+
+        $this->assertSame($dateTime, $advertisement->getExpiryDate());
+
+        $advertisement->setId(null);
+
+        $this->assertNull($advertisement->getId());
+    }
+
+    public function testSetExpiryDateFromString()
+    {
+        $data = $this->getAdvertisementData();
+        $advertisement = $this->createAdvertisement($data);
+        $advertisement->setExpiryDateFromString('2016-11-06T21:19:00Z');
+
+        $this->assertEquals('2016-11-06 21:19:00', $advertisement->getExpiryDate()->format('Y-m-d H:i:s'));
+    }
+
+    public function testSetState()
+    {
+        $data = $this->getAdvertisementData();
+        $advertisement = $this->createAdvertisement($data);
+        $advertisement->setState(AdvertisementState::get('Expired'));
+        $state =$advertisement->getState();
+
+        $this->assertInstanceOf('Seek\Enums\AdvertisementState', $state);
+        $this->assertEquals('Expired', $state->getValue());
+    }
+
     public function testGetArray()
     {
         $data = $this->getAdvertisementData();
         $advertisement = $this->createAdvertisement($data);
 
-        $this->assertSame($data, $advertisement->getArray());
+        $this->assertEquals($data, $advertisement->getArray());
     }
 
     private function createAdvertisement($data)

@@ -13,7 +13,9 @@ class Response
     public static function getContent(ResponseInterface $response)
     {
         $body = $response->getBody()->__toString();
-        if (strpos($response->getHeaderLine('Content-Type'), 'application/json') !== false) {
+        if (strpos($response->getHeaderLine('Content-Type'), 'application/json') !== false ||
+            strpos($response->getHeaderLine('Content-Type'), '+json') !== false
+        ) {
             $content = json_decode($body, true);
             if (json_last_error() == JSON_ERROR_NONE) {
                 return $content;

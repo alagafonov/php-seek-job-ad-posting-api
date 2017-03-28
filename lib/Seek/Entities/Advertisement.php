@@ -3,6 +3,7 @@
 use Seek\Enums\AdvertisementType;
 use Seek\Enums\SubClassification;
 use Seek\Enums\WorkType;
+use Seek\Enums\AdvertisementState;
 use Seek\Exceptions\InvalidArgumentException;
 use Seek\ValueObjects\Contact;
 use Seek\ValueObjects\Location;
@@ -12,12 +13,27 @@ use Seek\ValueObjects\StandOut;
 use Seek\ValueObjects\Template;
 use Seek\ValueObjects\ThirdParties;
 use Seek\ValueObjects\Video;
+use DateTime;
 
 /**
  * Advertisement entity
  */
 class Advertisement extends Entity
 {
+    /**
+     * SEEK internal ad id
+     *
+     * @var string
+     */
+    protected $id;
+
+    /**
+     * Client reference id
+     *
+     * @var string
+     */
+    protected $creationId;
+
     /**
      * Required when creating or updating an advertisement on behalf of an advertiser. Must not be supplied when
      * advertiser creates or updates the advertisement as themselves. When this attribute is supplied then advertiserId
@@ -180,7 +196,17 @@ class Advertisement extends Entity
     protected $graduate = false;
 
     /**
-     * @param string $id
+     * @var DateTime
+     */
+    protected $expiryDate = null;
+
+    /**
+     * @var AdvertisementState
+     */
+    protected $state = null;
+
+    /**
+     * @param string $creationId
      * @param ThirdParties $thirdParties
      * @param AdvertisementType $advertisementType
      * @param string $jobTitle
@@ -194,7 +220,7 @@ class Advertisement extends Entity
      * @throws InvalidArgumentException
      */
     public function __construct(
-        $id,
+        $creationId,
         ThirdParties $thirdParties,
         AdvertisementType $advertisementType,
         $jobTitle,
@@ -205,9 +231,8 @@ class Advertisement extends Entity
         $jobSummary,
         $advertisementDetails,
         Recruiter $recruiter
-
     ) {
-        parent::__construct($id);
+        $this->setCreationId($creationId);
         $this->setThirdParties($thirdParties);
         $this->setAdvertisementType($advertisementType);
         $this->setJobTitle($jobTitle);
@@ -675,6 +700,92 @@ class Advertisement extends Entity
     }
 
     /**
+     * @param string $creationId
+     * @throws InvalidArgumentException
+     */
+    public function setCreationId($creationId)
+    {
+        if ($creationId !== null && !is_string($creationId)) {
+            throw new InvalidArgumentException('Creation id must be a string');
+        }
+
+        $this->creationId = $creationId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreationId()
+    {
+        return $this->creationId;
+    }
+
+    /**
+     * @param string $id
+     * @throws InvalidArgumentException
+     */
+    public function setId($id)
+    {
+        if ($id !== null && !is_string($id)) {
+            throw new InvalidArgumentException('Id must be a string');
+        }
+        $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param DateTime $expiryDate
+     */
+    public function setExpiryDate(DateTime $expiryDate = null)
+    {
+        $this->expiryDate = $expiryDate;
+    }
+
+    /**
+     * @param string $expiryDate
+     * @throws InvalidArgumentException
+     */
+    public function setExpiryDateFromString($expiryDate)
+    {
+        if (!is_string($expiryDate)) {
+            throw new InvalidArgumentException('Expiry date must be a string');
+        }
+
+        $this->setExpiryDate(new DateTime($expiryDate));
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getExpiryDate()
+    {
+        return $this->expiryDate;
+    }
+
+    /**
+     * @param AdvertisementState $advertisementState
+     */
+    public function setState(AdvertisementState $advertisementState = null)
+    {
+        $this->state = $advertisementState;
+    }
+
+    /**
+     * @return AdvertisementState
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
      * @return array
      */
     public function getArray()
@@ -686,7 +797,7 @@ class Advertisement extends Entity
         if ($this->getGraduate()) {
             $additionalProperties[] = 'Graduate';
         }
-        return [
+        $result = [
             'thirdParties'         => $this->getThirdParties()->getArray(),
             'advertisementType'    => $this->getAdvertisementType()->getValue(),
             'jobTitle'             => $this->getJobTitle(),
@@ -704,12 +815,22 @@ class Advertisement extends Entity
             'endApplicationUrl'    => $this->getEndApplicationUrl(),
             'screenId'             => $this->getScreenId(),
             'jobReference'         => $this->getJobReference(),
-            'agentJobReference'    => $this->getAgentJobReference(),
             'template'             => $this->getTemplate()->getArray(),
             'standout'             => $this->getStandOut()->getArray(),
             'recruiter'            => $this->getRecruiter()->getArray(),
             'additionalProperties' => $additionalProperties,
-            'creationId'           => $this->getId(),
         ];
+
+        $agentJobReference = $this->getAgentJobReference();
+        if ($agentJobReference !== null) {
+            $result['agentJobReference'] = $agentJobReference;
+        }
+
+        $creationId = $this->getCreationId();
+        if ($creationId !== null) {
+            $result['creationId'] = $creationId;
+        }
+
+        return $result;
     }
 }

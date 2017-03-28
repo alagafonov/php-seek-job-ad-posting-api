@@ -48,8 +48,15 @@ class AdvertisementFactory extends AbstractEntityFactory
         'agentJobReference'  => [
             'function' => 'setAgentJobReference',
         ],
-        'agentJobReference'  => [
-            'function' => 'setAgentJobReference',
+        'id'                 => [
+            'function' => 'setId',
+        ],
+        'expiryDate'         => [
+            'function' => 'setExpiryDateFromString',
+        ],
+        'state' => [
+            'function' => 'setState',
+            'type' => '\Seek\Enums\AdvertisementState'
         ],
     ];
 
@@ -60,7 +67,7 @@ class AdvertisementFactory extends AbstractEntityFactory
     public static function createFromArray(array $data)
     {
         $advertisement = new Advertisement(
-            $data['creationId'],
+            empty($data['creationId']) ? null : $data['creationId'],
             new ThirdParties(
                 $data['thirdParties']['advertiserId'],
                 !empty($data['thirdParties']['agentId']) ? $data['thirdParties']['agentId'] : null

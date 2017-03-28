@@ -83,9 +83,13 @@ final class ThirdParties implements ValueObjectInterface
      */
     public function getArray()
     {
-        return [
+        $data = [
             'advertiserId' => $this->getAdvertiserId(),
-            'agentId'      => $this->getAgentId(),
         ];
+        $agentId = $this->getAgentId();
+        if ($agentId !== null) {
+            $data['agentId'] = $agentId;
+        }
+        return $data;
     }
 }

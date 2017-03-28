@@ -9,7 +9,7 @@ class Authorisation extends ApiAbstract
      * @param string $clientId
      * @param string $clientSecret
      * @param string $grantType
-     * @return string
+     * @return array
      */
     public function retrieveAccessToken($clientId, $clientSecret, $grantType)
     {

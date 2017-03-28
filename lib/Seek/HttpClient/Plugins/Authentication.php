@@ -4,32 +4,21 @@ use Http\Client\Common\Plugin;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * Authentication plugin.
+ * Authentication plugin
  */
 class Authentication implements Plugin
 {
     /**
      * @var string
      */
-    private $consumerKey;
-
-    /**
-     * @var string
-     */
-    private $consumerSecret;
-
     private $accessToken;
 
-    private $accessTokenExpiry = 0;
-
     /**
-     * @param $consumerKey
-     * @param $consumerSecret
+     * @param string $accessToken
      */
-    public function __construct($consumerKey, $consumerSecret)
+    public function __construct($accessToken)
     {
-        $this->consumerKey = $consumerKey;
-        $this->consumerSecret = $consumerSecret;
+        $this->accessToken = $accessToken;
     }
 
     /**
@@ -40,18 +29,7 @@ class Authentication implements Plugin
      */
     public function handleRequest(RequestInterface $request, callable $next, callable $first)
     {
-        $request = $request->withHeader(
-            'Authorization',
-            sprintf(
-                'OAuth oauth_consumer_key="%s", oauth_token="%s", oauth_signature_method="PLAINTEXT", ' .
-                'oauth_signature="%s&%s"',
-                $this->consumerKey,
-                $this->accessToken,
-                $this->consumerSecret,
-                $this->tokenSecret
-            )
-        );
-
+        $request = $request->withHeader('Authorization', sprintf('Bearer %s', $this->accessToken));
         return $next($request);
     }
 }
