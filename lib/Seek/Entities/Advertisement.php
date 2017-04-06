@@ -1,9 +1,10 @@
 <?php namespace Seek\Entities;
 
+use DateTime;
+use Seek\Enums\AdvertisementState;
 use Seek\Enums\AdvertisementType;
 use Seek\Enums\SubClassification;
 use Seek\Enums\WorkType;
-use Seek\Enums\AdvertisementState;
 use Seek\Exceptions\InvalidArgumentException;
 use Seek\ValueObjects\Contact;
 use Seek\ValueObjects\Location;
@@ -13,7 +14,6 @@ use Seek\ValueObjects\StandOut;
 use Seek\ValueObjects\Template;
 use Seek\ValueObjects\ThirdParties;
 use Seek\ValueObjects\Video;
-use DateTime;
 
 /**
  * Advertisement entity
