@@ -808,7 +808,6 @@ class Advertisement extends Entity
             'salary'               => $this->getSalary()->getArray(),
             'jobSummary'           => $this->getJobSummary(),
             'advertisementDetails' => $this->getAdvertisementDetails(),
-            'contact'              => $this->getContact()->getArray(),
             'video'                => $this->getVideo()->getArray(),
             'applicationEmail'     => $this->getApplicationEmail(),
             'applicationFormUrl'   => $this->getApplicationFormUrl(),
@@ -820,6 +819,11 @@ class Advertisement extends Entity
             'recruiter'            => $this->getRecruiter()->getArray(),
             'additionalProperties' => $additionalProperties,
         ];
+
+        $contact = $this->getContact();
+        if ($contact !== null) {
+            $result['contact'] = $contact->getArray();
+        }
 
         $agentJobReference = $this->getAgentJobReference();
         if ($agentJobReference !== null) {
