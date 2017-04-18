@@ -128,7 +128,7 @@ class AdvertisementFactory extends AbstractEntityFactory
         if (!empty($data['standout'])) {
             $advertisement->setStandOut(
                 new StandOut(
-                    $data['standout']['logoId'],
+                    !empty($data['standout']['logoId']) ? $data['standout']['logoId'] : null,
                     !empty($data['standout']['bullets']) ? $data['standout']['bullets'] : []
                 )
             );

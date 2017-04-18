@@ -45,7 +45,7 @@ final class StandOut implements ValueObjectInterface
      */
     private function setLogoId($logoId)
     {
-        if (!is_int($logoId)) {
+        if ($logoId !== null && !is_int($logoId)) {
             throw new InvalidArgumentException('Standout logo id must be an integer value');
         }
         $this->logoId = $logoId;
