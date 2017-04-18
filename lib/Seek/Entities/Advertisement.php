@@ -815,10 +815,14 @@ class Advertisement extends Entity
             'screenId'             => $this->getScreenId(),
             'jobReference'         => $this->getJobReference(),
             'template'             => $this->getTemplate()->getArray(),
-            'standout'             => $this->getStandOut()->getArray(),
             'recruiter'            => $this->getRecruiter()->getArray(),
             'additionalProperties' => $additionalProperties,
         ];
+
+        $standOut = $this->getStandOut();
+        if ($standOut !== null) {
+            $result['standout'] = $standOut->getArray();
+        }
 
         $contact = $this->getContact();
         if ($contact !== null) {

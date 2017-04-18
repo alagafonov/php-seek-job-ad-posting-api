@@ -76,7 +76,7 @@ class AdvertisementFactory extends AbstractEntityFactory
             $data['jobTitle'],
             new Location(
                 LocationCode::get($data['location']['id']),
-                $data['location']['areaId'] !== null ? LocationArea::get($data['location']['areaId']) : null
+                !empty($data['location']['areaId']) ? LocationArea::get($data['location']['areaId']) : null
             ),
             SubClassification::get($data['subclassificationId']),
             WorkType::get($data['workType']),
