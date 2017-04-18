@@ -69,9 +69,10 @@ final class Location implements ValueObjectInterface
      */
     public function getArray()
     {
+        $areaId = $this->getAreaId();
         return [
             'id'     => $this->getId()->getValue(),
-            'areaId' => $this->getAreaId()->getValue(),
+            'areaId' => $areaId === null ? $areaId : $areaId->getValue(),
         ];
     }
 }
