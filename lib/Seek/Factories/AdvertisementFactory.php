@@ -74,7 +74,10 @@ class AdvertisementFactory extends AbstractEntityFactory
             ),
             AdvertisementType::get($data['advertisementType']),
             $data['jobTitle'],
-            new Location(LocationCode::get($data['location']['id']), LocationArea::get($data['location']['areaId'])),
+            new Location(
+                LocationCode::get($data['location']['id']),
+                $data['location']['areaId'] !== null ? LocationArea::get($data['location']['areaId']) : null
+            ),
             SubClassification::get($data['subclassificationId']),
             WorkType::get($data['workType']),
             new Salary(
