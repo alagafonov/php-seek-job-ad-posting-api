@@ -1,4 +1,4 @@
-<?php namespace Trademe;
+<?php namespace Seek;
 
 /**
  * Snadbox API client.
@@ -8,5 +8,5 @@ class SandboxClient extends Client
     /**
      * @var string
      */
-    protected $apiUrl = 'https://api.tmsandbox.co.nz/v1';
+    protected $apiUrl = 'https://adposting-integration.cloud.seek.com.au';
 }

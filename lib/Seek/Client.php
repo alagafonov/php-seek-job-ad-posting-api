@@ -2,7 +2,6 @@
 
 use Http\Client\Common\HttpMethodsClient;
 use Http\Client\Common\Plugin;
-use Http\Client\Common\Plugin\AddHostPlugin;
 use Http\Client\Common\PluginClient;
 use Http\Client\HttpClient;
 use Http\Discovery\HttpClientDiscovery;
@@ -28,7 +27,7 @@ class Client
     /**
      * @var string
      */
-    protected $apiUrl = 'https://adposting-integration.cloud.seek.com.au';
+    protected $apiUrl = 'https://adposting.cloud.seek.com.au';
 
     /**
      * @var HttpClient
