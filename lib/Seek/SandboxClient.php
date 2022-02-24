@@ -8,5 +8,5 @@ class SandboxClient extends Client
     /**
      * @var string
      */
-    protected $apiUrl = 'https://adposting-integration.cloud.seek.com.au';
+    protected $audience = 'https://test.graphql.seek.com';
 }

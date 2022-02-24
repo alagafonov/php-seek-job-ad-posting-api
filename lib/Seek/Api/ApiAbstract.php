@@ -22,10 +22,22 @@ abstract class ApiAbstract implements ApiInterface
     }
 
     /**
-     * @param $path
+     * @param string $query
+     * @param array $parameters
+     * @return mixed
+     */
+    protected function query($query, array $parameters = [])
+    {
+        return $this->post('/graphql', ['query' => (string) $query, 'variables' => $parameters]);
+    }
+
+    /**
+     * @param string $path
      * @param array $parameters
      * @param array $headers
      * @return mixed
+     * @throws \Http\Client\Exception
+     * @throws \Seek\Exceptions\InvalidJsonException
      */
     protected function get($path, array $parameters = [], array $headers = [])
     {

@@ -17,8 +17,8 @@ use Seek\Token\Store\StoreInterface as TokenStoreInterface;
  * PHP seek.com.au ad posting API client library.
  *
  * @method Api\Authorisation authorisation()
- * @method Api\Links links()
- * @method Api\Advertisement advertisement()
+ * @method Api\Query query()
+ * @method Api\Location location()
  *
  * Website: https://github.com/alagafonov/php-seek-job-ad-posting-api
  */
@@ -27,7 +27,12 @@ class Client
     /**
      * @var string
      */
-    protected $apiUrl = 'https://adposting.cloud.seek.com.au';
+    protected $apiUrl = 'https://graphql.seek.com/graphql';
+
+    /**
+     * @var string
+     */
+    protected $audience = 'https://graphql.seek.com';
 
     /**
      * @var HttpClient
@@ -107,11 +112,11 @@ class Client
             case 'authorisation':
                 $api = new Api\Authorisation($this);
                 break;
-            case 'links':
-                $api = new Api\Links($this);
+            case 'query':
+                $api = new Api\Query($this);
                 break;
-            case 'advertisement':
-                $api = new Api\Advertisement($this);
+            case 'location':
+                $api = new Api\Location($this);
                 break;
             default:
                 throw new UnknownMethodException('Undefined end point instance called: "' . $name . '"');
@@ -151,6 +156,7 @@ class Client
             $response = $this->authorisation()->retrieveAccessToken(
                 $this->clientId,
                 $this->clientSecret,
+                $this->audience,
                 $this->grantType
             );
             $tokenStore->set(

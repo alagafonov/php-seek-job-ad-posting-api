@@ -8,19 +8,20 @@ class Authorisation extends ApiAbstract
     /**
      * @param string $clientId
      * @param string $clientSecret
+     * @param string $audience
      * @param string $grantType
      * @return array
      */
-    public function retrieveAccessToken($clientId, $clientSecret, $grantType)
+    public function retrieveAccessToken($clientId, $clientSecret, $audience, $grantType)
     {
         return $this->post(
-            '/auth/oauth2/token?' . http_build_query(
-                [
-                    'client_id'     => $clientId,
-                    'client_secret' => $clientSecret,
-                    'grant_type'    => $grantType,
-                ]
-            )
+            'https://auth.seek.com/oauth/token',
+            [
+                'client_id'     => $clientId,
+                'client_secret' => $clientSecret,
+                'audience'      => $audience,
+                'grant_type'    => $grantType,
+            ]
         );
     }
 }
