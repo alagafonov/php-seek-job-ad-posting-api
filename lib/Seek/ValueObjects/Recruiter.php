@@ -1,5 +1,6 @@
 <?php namespace Seek\ValueObjects;
 
+use Seek\Enums\ContactRoleCode;
 use Seek\Exceptions\InvalidArgumentException;
 
 /**
@@ -23,24 +24,33 @@ final class Recruiter implements ValueObjectInterface
     private $email;
 
     /**
-     * The team name of recruiter who is responsible for the job ad and handling the recruitment of the position is
-     * part of.
-     *
      * @var string
      */
-    private $teamName;
+    private $phone;
+
+    /**
+     * The role of the person.
+     *
+     * @var ContactRoleCode
+     */
+    private $roleCode;
 
     /**
      * @param string $fullName
      * @param string $email
-     * @param string|null $teamName
+     * @param string $phone
+     * @param ContactRoleCode $roleCode
      * @throws InvalidArgumentException
      */
-    public function __construct($fullName, $email, $teamName = null)
+    public function __construct($fullName, $email, $phone, ContactRoleCode $roleCode = null)
     {
         $this->setFullName($fullName);
         $this->setEmail($email);
-        $this->setTeamName($teamName);
+        $this->setPhone($phone);
+        if ($roleCode === null) {
+            $roleCode = ContactRoleCode::get('Recruiter');
+        }
+        $this->setRoleCode($roleCode);
     }
 
     /**
@@ -88,24 +98,42 @@ final class Recruiter implements ValueObjectInterface
     }
 
     /**
-     * @param string $teamName
+     * @param string $phone
      * @throws InvalidArgumentException
      */
-    private function setTeamName($teamName)
+    private function setPhone($phone)
     {
-        if ($teamName !== null && !is_string($teamName)) {
-            throw new InvalidArgumentException('Recruiter team name must be a string');
+        if (!is_string($phone)) {
+            throw new InvalidArgumentException('Recruiter phone must be a string');
         }
-
-        $this->teamName = $teamName;
+        if (!$phone) {
+            throw new InvalidArgumentException('Recruiter phone cannot be empty');
+        }
+        $this->phone = $phone;
     }
 
     /**
      * @return string
      */
-    public function getTeamName()
+    public function getPhone()
     {
-        return $this->teamName;
+        return $this->phone;
+    }
+
+    /**
+     * @param ContactRoleCode $roleCode
+     */
+    private function setRoleCode(ContactRoleCode $roleCode)
+    {
+        $this->roleCode = $roleCode;
+    }
+
+    /**
+     * @return ContactRoleCode
+     */
+    public function getRoleCode()
+    {
+        return $this->roleCode;
     }
 
     /**
@@ -114,9 +142,12 @@ final class Recruiter implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'fullName' => $this->getFullName(),
-            'email'    => $this->getEmail(),
-            'teamName' => $this->getTeamName(),
+            'name'          => ['formattedName' => $this->getFullName()],
+            'roleCode'      => $this->getRoleCode()->getValue(),
+            'communication' => [
+                'email' => [['address' => $this->getEmail()]],
+                'phone' => [['formattedNumber' => $this->getPhone()]],
+            ],
         ];
     }
 }

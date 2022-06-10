@@ -32,10 +32,8 @@ class ExceptionHandler implements Plugin
                 //print_r($content);
                 //echo $statusCode . ' : ' . $response->getBody()->__toString();
                 //exit;
-                if ($statusCode < 400 || $statusCode > 600) {
-                    return $response;
-                } elseif ($statusCode == 400) {
-                    throw new BadRequestException(empty($content['message']) ? 'Bad request' : $content['message']);
+                if ($statusCode == 400) {
+                    throw new BadRequestException($error === null ? 'Bad request' : $error);
                 } elseif ($statusCode == 401) {
                     throw new UnauthorizedException($error === null ? 'Unauthorized' : $error);
                 } elseif ($statusCode == 403) {
@@ -44,6 +42,10 @@ class ExceptionHandler implements Plugin
                     throw new NotFoundException('Resource not found');
                 } elseif ($statusCode == 422) {
                     throw new UnprocessableEntityException($error === null ? 'Unprocessable entity' : $error);
+                } elseif ($error) {
+                    throw new ApiErrorException($error);
+                } elseif ($statusCode < 400 || $statusCode > 600) {
+                    return $response;
                 }
                 throw new ApiErrorException($error === null ? 'Unknown server error' : $error);
             }

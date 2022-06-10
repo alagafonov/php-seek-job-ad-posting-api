@@ -7,8 +7,8 @@ use MabeEnum\Enum;
  */
 class SalaryType extends Enum
 {
-    const ANNUAL_PACKAGE = 'AnnualPackage';
-    const ANNUAL_COMMISSION = 'AnnualCommission';
+    const ANNUAL_PACKAGE = 'Salaried';
+    const ANNUAL_COMMISSION = 'SalariedPlusCommission';
     const COMMISSION_ONLY = 'CommissionOnly';
-    const HOURLY_RATE = 'HourlyRate';
+    const HOURLY_RATE = 'Hourly';
 }

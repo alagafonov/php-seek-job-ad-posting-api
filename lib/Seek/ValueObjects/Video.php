@@ -57,7 +57,6 @@ final class Video implements ValueObjectInterface
 
     /**
      * @param Position|null $position
-     * @throws InvalidArgumentException
      */
     private function setPosition(Position $position = null)
     {
@@ -78,8 +77,8 @@ final class Video implements ValueObjectInterface
     public function getArray()
     {
         return [
-            'url'      => $this->getUrl(),
-            'position' => $this->getPosition()->getValue(),
+            'url'                 => $this->getUrl(),
+            'seekAnzPositionCode' => $this->getPosition()->getValue(),
         ];
     }
 }

@@ -3,16 +3,12 @@
 use DateTime;
 use Seek\Enums\AdvertisementState;
 use Seek\Enums\AdvertisementType;
-use Seek\Enums\SubClassification;
+use Seek\Enums\PositionStatus;
 use Seek\Enums\WorkType;
 use Seek\Exceptions\InvalidArgumentException;
 use Seek\ValueObjects\Contact;
-use Seek\ValueObjects\Location;
 use Seek\ValueObjects\Recruiter;
 use Seek\ValueObjects\Salary;
-use Seek\ValueObjects\StandOut;
-use Seek\ValueObjects\Template;
-use Seek\ValueObjects\ThirdParties;
 use Seek\ValueObjects\Video;
 
 /**
@@ -35,14 +31,16 @@ class Advertisement extends Entity
     protected $creationId;
 
     /**
-     * Required when creating or updating an advertisement on behalf of an advertiser. Must not be supplied when
-     * advertiser creates or updates the advertisement as themselves. When this attribute is supplied then advertiserId
-     * is required. When this attribute is supplied then agentId should only be supplied when the caller is posting an
-     * advertisement on behalf of the agent i.e. the caller is not the agent.
+     * The identifier for the HiringOrganization that owns the position opening.
      *
-     * @var ThirdParties
+     * @var string
      */
-    protected $thirdParties;
+    protected $hirerId;
+
+    /**
+     * @var PositionStatus
+     */
+    protected $positionStatus;
 
     /**
      * @var AdvertisementType
@@ -58,23 +56,21 @@ class Advertisement extends Entity
     protected $jobTitle;
 
     /**
-     * Defines the search title of the job role or occupation which is used by the SEEK search engine [limited to 80
-     * characters]. No formatting tags are allowed e.g. < b >Bold< /b >, < br >, etc. When this field is not provided,
-     * the jobTitle is used as the search title.
-     *
-     * @var string
-     */
-    protected $searchJobTitle;
-
-    /**
      * The location and area of the job. When area is provided, the area must be within the location.
      *
-     * @var Location
+     * @var string
      */
     protected $location;
 
     /**
-     * @var SubClassification
+     * The identifier for the AdvertisementBranding to apply to the posted job ad.
+     *
+     * @var string
+     */
+    protected $brandingId;
+
+    /**
+     * @var string
      */
     protected $subClassification;
 
@@ -134,20 +130,6 @@ class Advertisement extends Entity
     protected $applicationFormUrl = null;
 
     /**
-     * The URL that the candidate lands on at the end of the application [limited to 500 characters].
-     *
-     * @var string
-     */
-    protected $endApplicationUrl = null;
-
-    /**
-     * The ID number of an existing SEEK Screen to attach to the job advertisement
-     *
-     * @var integer
-     */
-    protected $screenId = null;
-
-    /**
      * A quotable reference code used by the advertiser to identify the job advertisement [limited to 50 characters].
      * No formatting tags are allowed e.g. < b >Bold< /b >, < br >, etc. JOB1234
      *
@@ -164,36 +146,9 @@ class Advertisement extends Entity
     protected $agentJobReference = null;
 
     /**
-     * When a custom template is to be used for the advertisement, it's ID and custom field values can be specified
-     * here.
-     *
-     * @var Template
-     */
-    protected $template = null;
-
-    /**
-     * When the advertisementType is StandOut then this attribute contains standout advertisement values.
-     *
-     * @var StandOut
-     */
-    protected $standOut = null;
-
-    /**
      * @var Recruiter
      */
     protected $recruiter = null;
-
-    /**
-     * The job will specify that it is available for Australian/NZ residents only.
-     *
-     * @var bool
-     */
-    protected $residentsOnly = false;
-
-    /**
-     * @var bool
-     */
-    protected $graduate = false;
 
     /**
      * @var DateTime
@@ -206,12 +161,23 @@ class Advertisement extends Entity
     protected $state = null;
 
     /**
+     * @var array
+     */
+    protected $searchBulletPoints = [];
+
+    /**
+     * @var string
+     */
+    protected $billingReference;
+
+    /**
      * @param string $creationId
-     * @param ThirdParties $thirdParties
+     * @param string $hirerId
+     * @param PositionStatus $positionStatus
      * @param AdvertisementType $advertisementType
      * @param string $jobTitle
-     * @param Location $location
-     * @param SubClassification $subClassification
+     * @param string $location
+     * @param string $subClassification
      * @param WorkType $workType
      * @param Salary $salary
      * @param string $jobSummary
@@ -221,11 +187,12 @@ class Advertisement extends Entity
      */
     public function __construct(
         $creationId,
-        ThirdParties $thirdParties,
+        $hirerId,
+        PositionStatus $positionStatus,
         AdvertisementType $advertisementType,
         $jobTitle,
-        Location $location,
-        SubClassification $subClassification,
+        $location,
+        $subClassification,
         WorkType $workType,
         Salary $salary,
         $jobSummary,
@@ -233,7 +200,8 @@ class Advertisement extends Entity
         Recruiter $recruiter
     ) {
         $this->setCreationId($creationId);
-        $this->setThirdParties($thirdParties);
+        $this->setHirerId($hirerId);
+        $this->setPositionStatus($positionStatus);
         $this->setAdvertisementType($advertisementType);
         $this->setJobTitle($jobTitle);
         $this->setLocation($location);
@@ -246,19 +214,43 @@ class Advertisement extends Entity
     }
 
     /**
-     * @param ThirdParties $thirdParties
+     * @param string $hirerId
+     * @throws InvalidArgumentException
      */
-    public function setThirdParties(ThirdParties $thirdParties)
+    public function setHirerId($hirerId)
     {
-        $this->thirdParties = $thirdParties;
+        if (!is_string($hirerId)) {
+            throw new InvalidArgumentException('Hirer id must be a string');
+        }
+
+        if (!$hirerId) {
+            throw new InvalidArgumentException('Hirer id cannot be empty');
+        }
+        $this->hirerId = $hirerId;
     }
 
     /**
-     * @return ThirdParties
+     * @return string
      */
-    public function getThirdParties()
+    public function getHirerId()
     {
-        return $this->thirdParties;
+        return $this->hirerId;
+    }
+
+    /**
+     * @param PositionStatus $positionStatus
+     */
+    public function setPositionStatus(PositionStatus $positionStatus)
+    {
+        $this->positionStatus = $positionStatus;
+    }
+
+    /**
+     * @return PositionStatus
+     */
+    public function getPositionStatus()
+    {
+        return $this->positionStatus;
     }
 
     /**
@@ -278,15 +270,19 @@ class Advertisement extends Entity
     }
 
     /**
-     * @param Location $location
+     * @param string $location
+     * @throws InvalidArgumentException
      */
-    public function setLocation(Location $location)
+    public function setLocation($location)
     {
+        if (!is_string($location)) {
+            throw new InvalidArgumentException('Location must be a string');
+        }
         $this->location = $location;
     }
 
     /**
-     * @return Location
+     * @return string
      */
     public function getLocation()
     {
@@ -350,6 +346,44 @@ class Advertisement extends Entity
     }
 
     /**
+     * @param int $number
+     * @param string $searchBulletPoint
+     * @throws InvalidArgumentException
+     */
+    public function setSearchBulletPoint($number, $searchBulletPoint)
+    {
+        if ($number < 1 || $number > 3) {
+            throw new InvalidArgumentException('Bullet point number must be in a range between 1 and 3');
+        }
+
+        if (!is_string($searchBulletPoint)) {
+            throw new InvalidArgumentException('Search bullet point must be a string');
+        }
+
+        if (!$searchBulletPoint) {
+            throw new InvalidArgumentException('Search bullet point cannot be empty');
+        }
+
+        if (strlen($searchBulletPoint) > 80) {
+            throw new InvalidArgumentException('Search bullet point must be no more than 80 characters long');
+        }
+        $this->searchBulletPoints[$number] = $searchBulletPoint;
+    }
+
+    /**
+     * @param int $number
+     * @return mixed|null
+     * @throws InvalidArgumentException
+     */
+    public function getSearchBulletPoint($number)
+    {
+        if ($number < 1 || $number > 3) {
+            throw new InvalidArgumentException('Bullet point number must be in a range between 1 and 3');
+        }
+        return isset($this->searchBulletPoints[$number]) ? $this->searchBulletPoints[$number] : null;
+    }
+
+    /**
      * @param string $advertisementDetails
      * @throws InvalidArgumentException
      */
@@ -363,7 +397,7 @@ class Advertisement extends Entity
             throw new InvalidArgumentException('Advertisement details cannot be empty');
         }
 
-        if (strlen($advertisementDetails) > 20000) {
+        if (strlen($advertisementDetails) > 15000) {
             throw new InvalidArgumentException('Advertisement details must be no more than 20000 characters long');
         }
         $this->advertisementDetails = $advertisementDetails;
@@ -377,46 +411,63 @@ class Advertisement extends Entity
         return $this->advertisementDetails;
     }
 
-
     /**
-     * @param string $searchJobTitle
+     * @param string $brandingId
      * @throws InvalidArgumentException
      */
-    public function setSearchJobTitle($searchJobTitle)
+    public function setBrandingId($brandingId)
     {
-        if (!is_string($searchJobTitle)) {
-            throw new InvalidArgumentException('Search job title must be a string');
+        if (!is_string($brandingId)) {
+            throw new InvalidArgumentException('Branding id must be a string');
         }
-
-        if (!$searchJobTitle) {
-            throw new InvalidArgumentException('Search job title cannot be empty');
-        }
-
-        if (strlen($searchJobTitle) > 80) {
-            throw new InvalidArgumentException('Search job title must be no more than 80 characters long');
-        }
-        $this->searchJobTitle = $searchJobTitle;
+        $this->brandingId = $brandingId;
     }
 
     /**
      * @return string
      */
-    public function getSearchJobTitle()
+    public function getBrandingId()
     {
-        return $this->searchJobTitle;
+        return $this->brandingId;
     }
 
     /**
-     * @param SubClassification $subClassification
+     * @param string $billingReference
      * @throws InvalidArgumentException
      */
-    public function setSubClassification(SubClassification $subClassification)
+    public function setBillingReference($billingReference)
     {
+        if (!is_string($billingReference)) {
+            throw new InvalidArgumentException('Billing Reference must be a string');
+        }
+        $this->billingReference = $billingReference;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBillingReference()
+    {
+        return $this->billingReference;
+    }
+
+    /**
+     * @param string $subClassification
+     * @throws InvalidArgumentException
+     */
+    public function setSubClassification($subClassification)
+    {
+        if (!is_string($subClassification)) {
+            throw new InvalidArgumentException('Sub-classification must be a string');
+        }
+        if (!$subClassification) {
+            throw new InvalidArgumentException('Sub-classification cannot be empty');
+        }
         $this->subClassification = $subClassification;
     }
 
     /**
-     * @return SubClassification
+     * @return string
      */
     public function getSubClassification()
     {
@@ -425,7 +476,6 @@ class Advertisement extends Entity
 
     /**
      * @param WorkType $workType
-     * @throws InvalidArgumentException
      */
     public function setWorkType(WorkType $workType)
     {
@@ -442,7 +492,6 @@ class Advertisement extends Entity
 
     /**
      * @param Salary $salary
-     * @throws InvalidArgumentException
      */
     public function setSalary(Salary $salary)
     {
@@ -459,7 +508,6 @@ class Advertisement extends Entity
 
     /**
      * @param Contact $contact
-     * @throws InvalidArgumentException
      */
     public function setContact(Contact $contact)
     {
@@ -476,7 +524,6 @@ class Advertisement extends Entity
 
     /**
      * @param Video $video
-     * @throws InvalidArgumentException
      */
     public function setVideo(Video $video)
     {
@@ -532,46 +579,6 @@ class Advertisement extends Entity
     }
 
     /**
-     * @param string $endApplicationUrl
-     * @throws InvalidArgumentException
-     */
-    public function setEndApplicationUrl($endApplicationUrl)
-    {
-        if ($endApplicationUrl !== null && !filter_var($endApplicationUrl, FILTER_VALIDATE_URL)) {
-            throw new InvalidArgumentException('End application URL format is invalid');
-        }
-        $this->endApplicationUrl = $endApplicationUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEndApplicationUrl()
-    {
-        return $this->endApplicationUrl;
-    }
-
-    /**
-     * @param int $screenId
-     * @throws InvalidArgumentException
-     */
-    public function setScreenId($screenId)
-    {
-        if ($screenId !== null && !is_int($screenId)) {
-            throw new InvalidArgumentException('Screen id must be an integer');
-        }
-        $this->screenId = $screenId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getScreenId()
-    {
-        return $this->screenId;
-    }
-
-    /**
      * @param string $jobReference
      * @throws InvalidArgumentException
      */
@@ -612,38 +619,6 @@ class Advertisement extends Entity
     }
 
     /**
-     * @param StandOut $standOut
-     */
-    public function setStandOut(StandOut $standOut)
-    {
-        $this->standOut = $standOut;
-    }
-
-    /**
-     * @return StandOut
-     */
-    public function getStandOut()
-    {
-        return $this->standOut;
-    }
-
-    /**
-     * @param Template $template
-     */
-    public function setTemplate(Template $template)
-    {
-        $this->template = $template;
-    }
-
-    /**
-     * @return Template
-     */
-    public function getTemplate()
-    {
-        return $this->template;
-    }
-
-    /**
      * @param Recruiter $recruiter
      */
     public function setRecruiter(Recruiter $recruiter)
@@ -657,46 +632,6 @@ class Advertisement extends Entity
     public function getRecruiter()
     {
         return $this->recruiter;
-    }
-
-    /**
-     * @param bool $residentsOnly
-     * @throws InvalidArgumentException
-     */
-    public function setResidentsOnly($residentsOnly)
-    {
-        if ($residentsOnly !== null && !is_bool($residentsOnly)) {
-            throw new InvalidArgumentException('Residents only flag must be a boolean value');
-        }
-        $this->residentsOnly = $residentsOnly;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getResidentsOnly()
-    {
-        return $this->residentsOnly;
-    }
-
-    /**
-     * @param bool $graduate
-     * @throws InvalidArgumentException
-     */
-    public function setGraduate($graduate)
-    {
-        if ($graduate !== null && !is_bool($graduate)) {
-            throw new InvalidArgumentException('Graduates flag must be a boolean value');
-        }
-        $this->graduate = $graduate;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getGraduate()
-    {
-        return $this->graduate;
     }
 
     /**
@@ -786,63 +721,73 @@ class Advertisement extends Entity
     }
 
     /**
-     * @return array
+     * @param bool $includeOpening
+     * @return array[]
+     * @throws InvalidArgumentException
      */
-    public function getArray()
+    public function getArray($includeOpening = true)
     {
-        $additionalProperties = [];
-        if ($this->getResidentsOnly()) {
-            $additionalProperties[] = 'ResidentsOnly';
-        }
-        if ($this->getGraduate()) {
-            $additionalProperties[] = 'Graduate';
-        }
-        $result = [
-            'thirdParties'         => $this->getThirdParties()->getArray(),
-            'advertisementType'    => $this->getAdvertisementType()->getValue(),
-            'jobTitle'             => $this->getJobTitle(),
-            'searchJobTitle'       => $this->getSearchJobTitle(),
-            'location'             => $this->getLocation()->getArray(),
-            'subclassificationId'  => $this->getSubClassification()->getValue(),
-            'workType'             => $this->getWorkType()->getValue(),
-            'salary'               => $this->getSalary()->getArray(),
-            'jobSummary'           => $this->getJobSummary(),
-            'advertisementDetails' => $this->getAdvertisementDetails(),
-            'applicationEmail'     => $this->getApplicationEmail(),
-            'applicationFormUrl'   => $this->getApplicationFormUrl(),
-            'endApplicationUrl'    => $this->getEndApplicationUrl(),
-            'screenId'             => $this->getScreenId(),
-            'jobReference'         => $this->getJobReference(),
-            'template'             => $this->getTemplate()->getArray(),
-            'recruiter'            => $this->getRecruiter()->getArray(),
-            'additionalProperties' => $additionalProperties,
+        $positionOpening = [
+            'postingRequester' => [
+                'id'             => $this->getHirerId(),
+                'personContacts' => [$this->getRecruiter()->getArray()],
+                'roleCode'       => 'Company',
+            ],
+            'statusCode'       => $this->getPositionStatus()->getValue(),
         ];
-
+        $positionProfile = [
+            'jobCategories'                 => [$this->getSubClassification()],
+            'offeredRemunerationPackage'    => $this->getSalary()->getArray(),
+            'positionFormattedDescriptions' => [
+                [
+                    'descriptionId' => 'SearchSummary',
+                    'content'       => $this->getJobSummary(),
+                ],
+                [
+                    'descriptionId' => 'AdvertisementDetails',
+                    'content'       => $this->getAdvertisementDetails(),
+                ],
+            ],
+            'positionLocation'              => [$this->getLocation()],
+            'positionOrganizations'         => [$this->getHirerId()],
+            'positionTitle'                 => $this->getJobTitle(),
+            'postingInstructions'           => [
+                'seekAnzAdvertisementType' => $this->getAdvertisementType()->getValue(),
+                /*'applicationMethods'       => [
+                    'applicationUri' => ['url' => $this->getApplicationFormUrl()],
+                ],*/
+                'brandingId'               => $this->getBrandingId(),
+            ],
+            'seekAnzWorkTypeCode'           => $this->getWorkType()->getValue(),
+            'seekBillingReference'          => $this->getBillingReference(),
+        ];
+        $profileId = $this->getId();
+        if ($profileId) {
+            $positionProfile['profileId'] = $profileId;
+        } else {
+            $positionProfile['postingInstructions']['idempotencyId'] = $this->getCreationId();
+        }
+        $brandingId = $this->getBrandingId();
+        if ($brandingId) {
+            $positionProfile['postingInstructions']['brandingId'] = $brandingId;
+        }
         $video = $this->getVideo();
         if ($video !== null) {
-            $result['video'] = $video->getArray();
+            $positionProfile['seekVideo'] = $video->getArray();
         }
-
-        $standOut = $this->getStandOut();
-        if ($standOut !== null) {
-            $result['standout'] = $standOut->getArray();
+        for ($i = 1; $i < 4; $i++) {
+            $searchBulletPoint = $this->getSearchBulletPoint($i);
+            if ($searchBulletPoint) {
+                $positionProfile['positionFormattedDescriptions'][] = [
+                    'descriptionId' => 'SearchBulletPoint',
+                    'content'       => $searchBulletPoint,
+                ];
+            }
         }
-
-        $contact = $this->getContact();
-        if ($contact !== null) {
-            $result['contact'] = $contact->getArray();
+        $result = ['positionProfile' => $positionProfile];
+        if ($includeOpening) {
+            $result['positionOpening'] = $positionOpening;
         }
-
-        $agentJobReference = $this->getAgentJobReference();
-        if ($agentJobReference !== null) {
-            $result['agentJobReference'] = $agentJobReference;
-        }
-
-        $creationId = $this->getCreationId();
-        if ($creationId !== null) {
-            $result['creationId'] = $creationId;
-        }
-
         return $result;
     }
 }

@@ -2,20 +2,14 @@
 
 use Seek\Entities\Advertisement;
 use Seek\Enums\AdvertisementType;
-use Seek\Enums\Location as LocationCode;
-use Seek\Enums\LocationArea;
 use Seek\Enums\Position;
+use Seek\Enums\PositionStatus;
 use Seek\Enums\SalaryType;
-use Seek\Enums\SubClassification;
 use Seek\Enums\WorkType;
+use Seek\Exceptions\InvalidArgumentException;
 use Seek\ValueObjects\Contact;
-use Seek\ValueObjects\Location;
 use Seek\ValueObjects\Recruiter;
 use Seek\ValueObjects\Salary;
-use Seek\ValueObjects\StandOut;
-use Seek\ValueObjects\Template;
-use Seek\ValueObjects\TemplateItem;
-use Seek\ValueObjects\ThirdParties;
 use Seek\ValueObjects\Video;
 
 /**
@@ -27,20 +21,11 @@ class AdvertisementFactory extends AbstractEntityFactory
      * @var array
      */
     private static $mappings = [
-        'searchJobTitle'     => [
-            'function' => 'setSearchJobTitle',
-        ],
         'applicationEmail'   => [
             'function' => 'setApplicationEmail',
         ],
         'applicationFormUrl' => [
             'function' => 'setApplicationFormUrl',
-        ],
-        'endApplicationUrl'  => [
-            'function' => 'setEndApplicationUrl',
-        ],
-        'screenId'           => [
-            'function' => 'setScreenId',
         ],
         'jobReference'       => [
             'function' => 'setJobReference',
@@ -54,43 +39,47 @@ class AdvertisementFactory extends AbstractEntityFactory
         'expiryDate'         => [
             'function' => 'setExpiryDateFromString',
         ],
-        'state' => [
+        'state'              => [
             'function' => 'setState',
-            'type' => '\Seek\Enums\AdvertisementState'
+            'type'     => '\Seek\Enums\AdvertisementState',
         ],
+        'brandingId'  => [
+            'function' => 'setBrandingId',
+        ],
+        'billingReference'  => [
+            'function' => 'setBillingReference',
+        ],
+
     ];
 
     /**
      * @param array $data
      * @return Advertisement
+     * @throws InvalidArgumentException
      */
     public static function createFromArray(array $data)
     {
         $advertisement = new Advertisement(
-            empty($data['creationId']) ? null : $data['creationId'],
-            new ThirdParties(
-                $data['thirdParties']['advertiserId'],
-                !empty($data['thirdParties']['agentId']) ? $data['thirdParties']['agentId'] : null
-            ),
+            $data['creationId'],
+            $data['hirerId'],
+            PositionStatus::get($data['positionStatus']),
             AdvertisementType::get($data['advertisementType']),
             $data['jobTitle'],
-            new Location(
-                LocationCode::get($data['location']['id']),
-                !empty($data['location']['areaId']) ? LocationArea::get($data['location']['areaId']) : null
-            ),
-            SubClassification::get($data['subclassificationId']),
+            $data['location'],
+            $data['subclassificationId'],
             WorkType::get($data['workType']),
             new Salary(
                 SalaryType::get($data['salary']['type']),
                 $data['salary']['minimum'],
                 $data['salary']['maximum'],
-                !empty($data['salary']['details']) ? $data['salary']['details'] : null
+                !empty($data['salary']['details']) ? $data['salary']['details'] : ''
             ),
             $data['jobSummary'],
             $data['advertisementDetails'],
             new Recruiter(
                 $data['recruiter']['fullName'],
                 $data['recruiter']['email'],
+                $data['recruiter']['phone'],
                 !empty($data['recruiter']['teamName']) ? $data['recruiter']['teamName'] : null
             )
         );
@@ -115,33 +104,16 @@ class AdvertisementFactory extends AbstractEntityFactory
             );
         }
 
-        if (!empty($data['template'])) {
-            $items = [];
-            if (!empty($data['template']['items'])) {
-                foreach ($data['template']['items'] as $item) {
-                    $items[] = new TemplateItem($item['name'], $item['value']);
-                }
-            }
-            $advertisement->setTemplate(new Template($data['template']['id'], $items));
+        if (!empty($data['searchBulletPoint1'])) {
+            $advertisement->setSearchBulletPoint(1, $data['searchBulletPoint1']);
         }
 
-        if (!empty($data['standout'])) {
-            $advertisement->setStandOut(
-                new StandOut(
-                    !empty($data['standout']['logoId']) ? $data['standout']['logoId'] : null,
-                    !empty($data['standout']['bullets']) ? $data['standout']['bullets'] : []
-                )
-            );
+        if (!empty($data['searchBulletPoint2'])) {
+            $advertisement->setSearchBulletPoint(2, $data['searchBulletPoint2']);
         }
 
-        if (!empty($data['additionalProperties'])) {
-            foreach ($data['additionalProperties'] as $property) {
-                if ($property == 'ResidentsOnly') {
-                    $advertisement->setResidentsOnly(true);
-                } elseif ($property == 'Graduate') {
-                    $advertisement->setGraduate(true);
-                }
-            }
+        if (!empty($data['searchBulletPoint3'])) {
+            $advertisement->setSearchBulletPoint(3, $data['searchBulletPoint3']);
         }
 
         return $advertisement;

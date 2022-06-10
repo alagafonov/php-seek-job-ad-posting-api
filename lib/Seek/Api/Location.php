@@ -11,12 +11,12 @@ class Location extends ApiAbstract
     /**
      * @param string $schemeId
      * @param string $text
+     * @param string $hirerId
      * @param string $usageTypeCode
      * @param int $first
-     * @param string $hirerId
      * @return mixed
      */
-    public function suggest($schemeId, $text, $usageTypeCode = UsageType::POSITION_POSTING, $first = 10, $hirerId = '')
+    public function suggest($schemeId, $text, $hirerId, $usageTypeCode = UsageType::POSITION_POSTING, $first = 10)
     {
         $result = $this->query(
             '

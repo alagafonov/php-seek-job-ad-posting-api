@@ -39,9 +39,10 @@ final class Salary implements ValueObjectInterface
      * @param SalaryType $type
      * @param float $minimum
      * @param float $maximum
-     * @param string|null $details
+     * @param string $details
+     * @throws InvalidArgumentException
      */
-    public function __construct(SalaryType $type, $minimum, $maximum, $details = null)
+    public function __construct(SalaryType $type, $minimum, $maximum, $details = '')
     {
         $this->setType($type);
         $this->setMinimum($minimum);
@@ -73,6 +74,10 @@ final class Salary implements ValueObjectInterface
     {
         if (!is_float($minimum) && !is_int($minimum)) {
             throw new InvalidArgumentException('Salary minimum amount must be a numeric value');
+        }
+
+        if (!$minimum) {
+            throw new InvalidArgumentException('Salary minimum amount must be greater than 0');
         }
 
         $this->minimum = $minimum;
@@ -136,11 +141,15 @@ final class Salary implements ValueObjectInterface
      */
     public function getArray()
     {
+        $type = $this->getType()->getValue();
         return [
-            'type'    => $this->getType()->getValue(),
-            'minimum' => $this->getMinimum(),
-            'maximum' => $this->getMaximum(),
-            'details' => $this->getDetails(),
+            'basisCode'    => $type,
+            'descriptions' => [$this->getDetails()],
+            'ranges'       => [
+                'intervalCode'  => $type == SalaryType::HOURLY_RATE ? 'Hour' : 'Year',
+                'minimumAmount' => ['currency' => 'AUD', 'value' => $this->getMinimum()],
+                'maximumAmount' => ['currency' => 'AUD', 'value' => $this->getMaximum()],
+            ],
         ];
     }
 }
