@@ -753,9 +753,9 @@ class Advertisement extends Entity
             'positionTitle'                 => $this->getJobTitle(),
             'postingInstructions'           => [
                 'seekAnzAdvertisementType' => $this->getAdvertisementType()->getValue(),
-                /*'applicationMethods'       => [
+                'applicationMethods'       => [
                     'applicationUri' => ['url' => $this->getApplicationFormUrl()],
-                ],*/
+                ],
                 'brandingId'               => $this->getBrandingId(),
             ],
             'seekAnzWorkTypeCode'           => $this->getWorkType()->getValue(),
