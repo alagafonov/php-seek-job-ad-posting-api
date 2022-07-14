@@ -753,14 +753,15 @@ class Advertisement extends Entity
             'positionTitle'                 => $this->getJobTitle(),
             'postingInstructions'           => [
                 'seekAnzAdvertisementType' => $this->getAdvertisementType()->getValue(),
-                'applicationMethods'       => [
-                    'applicationUri' => ['url' => $this->getApplicationFormUrl()],
-                ],
                 'brandingId'               => $this->getBrandingId(),
             ],
             'seekAnzWorkTypeCode'           => $this->getWorkType()->getValue(),
             'seekBillingReference'          => $this->getBillingReference(),
         ];
+        $formUrl = $this->getApplicationFormUrl();
+        if ($formUrl) {
+            $positionProfile['applicationMethods']['applicationUri']['url'] = $formUrl;
+        }
         $profileId = $this->getId();
         if ($profileId) {
             $positionProfile['profileId'] = $profileId;
