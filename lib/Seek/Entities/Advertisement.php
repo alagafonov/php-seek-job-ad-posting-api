@@ -760,7 +760,7 @@ class Advertisement extends Entity
         ];
         $formUrl = $this->getApplicationFormUrl();
         if ($formUrl) {
-            $positionProfile['applicationMethods']['applicationUri']['url'] = $formUrl;
+            $positionProfile['postingInstructions']['applicationMethods']['applicationUri']['url'] = $formUrl;
         }
         $profileId = $this->getId();
         if ($profileId) {
