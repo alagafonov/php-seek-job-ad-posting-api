@@ -72,7 +72,8 @@ class AdvertisementFactory extends AbstractEntityFactory
                 SalaryType::get($data['salary']['type']),
                 $data['salary']['minimum'],
                 $data['salary']['maximum'],
-                !empty($data['salary']['details']) ? $data['salary']['details'] : ''
+                !empty($data['salary']['details']) ? $data['salary']['details'] : '',
+                !empty($data['salary']['currency']) ? $data['salary']['currency'] : 'AUD'
             ),
             $data['jobSummary'],
             $data['advertisementDetails'],

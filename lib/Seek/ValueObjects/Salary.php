@@ -36,18 +36,27 @@ final class Salary implements ValueObjectInterface
     private $details;
 
     /**
+     * Salary currency
+     *
+     * @var string
+     */
+    private $currency;
+
+    /**
      * @param SalaryType $type
      * @param float $minimum
      * @param float $maximum
      * @param string $details
+     * @param string $currency
      * @throws InvalidArgumentException
      */
-    public function __construct(SalaryType $type, $minimum, $maximum, $details = '')
+    public function __construct(SalaryType $type, $minimum, $maximum, $details = '', $currency = 'AUD')
     {
         $this->setType($type);
         $this->setMinimum($minimum);
         $this->setMaximum($maximum);
         $this->setDetails($details);
+        $this->setCurrency($currency);
     }
 
     /**
@@ -137,6 +146,30 @@ final class Salary implements ValueObjectInterface
     }
 
     /**
+     * @param string $currency
+     * @throws InvalidArgumentException
+     */
+    private function setCurrency($currency)
+    {
+        if (!is_string($currency)) {
+            throw new InvalidArgumentException('Currency must be a string');
+        }
+
+        if (!in_array($currency, ['AUD', 'NZD', 'USD'])) {
+            throw new InvalidArgumentException('Currency "'.$currency.'" is invalid.');
+        }
+        $this->currency = $currency;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
      * @return array
      */
     public function getArray()
@@ -147,8 +180,8 @@ final class Salary implements ValueObjectInterface
             'descriptions' => [$this->getDetails()],
             'ranges'       => [
                 'intervalCode'  => $type == SalaryType::HOURLY_RATE ? 'Hour' : 'Year',
-                'minimumAmount' => ['currency' => 'AUD', 'value' => $this->getMinimum()],
-                'maximumAmount' => ['currency' => 'AUD', 'value' => $this->getMaximum()],
+                'minimumAmount' => ['currency' => $this->getCurrency(), 'value' => $this->getMinimum()],
+                'maximumAmount' => ['currency' => $this->getCurrency(), 'value' => $this->getMaximum()],
             ],
         ];
     }
