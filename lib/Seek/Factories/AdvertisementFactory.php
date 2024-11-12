@@ -1,6 +1,7 @@
 <?php namespace Seek\Factories;
 
 use Seek\Entities\Advertisement;
+use Seek\Entities\AdvertisementPreview;
 use Seek\Enums\AdvertisementType;
 use Seek\Enums\Position;
 use Seek\Enums\PositionStatus;
@@ -118,5 +119,54 @@ class AdvertisementFactory extends AbstractEntityFactory
         }
 
         return $advertisement;
+    }
+
+    /**
+     * @param array $data
+     * @return Advertisement
+     * @throws InvalidArgumentException
+     */
+    public static function createPreviewFromArray(array $data)
+    {
+        $advertisementPreview = new AdvertisementPreview(
+            $data['hirerId'],
+            $data['jobTitle'],
+            WorkType::get($data['workType']),
+            AdvertisementType::get($data['advertisementType'])
+        );
+        /*self::populateEntity($advertisement, $data, self::$mappings);
+
+        if (!empty($data['contact'])) {
+            $advertisement->setContact(
+                new Contact(
+                    $data['contact']['name'],
+                    !empty($data['contact']['phone']) ? $data['contact']['phone'] : null,
+                    !empty($data['contact']['email']) ? $data['contact']['email'] : null
+                )
+            );
+        }
+
+        if (!empty($data['video'])) {
+            $advertisement->setVideo(
+                new Video(
+                    $data['video']['url'],
+                    !empty($data['video']['position']) ? Position::get($data['video']['position']) : null
+                )
+            );
+        }
+
+        if (!empty($data['searchBulletPoint1'])) {
+            $advertisement->setSearchBulletPoint(1, $data['searchBulletPoint1']);
+        }
+
+        if (!empty($data['searchBulletPoint2'])) {
+            $advertisement->setSearchBulletPoint(2, $data['searchBulletPoint2']);
+        }
+
+        if (!empty($data['searchBulletPoint3'])) {
+            $advertisement->setSearchBulletPoint(3, $data['searchBulletPoint3']);
+        }*/
+
+        return $advertisementPreview;
     }
 }

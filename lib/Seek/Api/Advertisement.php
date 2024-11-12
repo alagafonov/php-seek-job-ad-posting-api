@@ -1,6 +1,8 @@
 <?php namespace Seek\Api;
 
 use Seek\Entities\Advertisement as AdvertisementEntity;
+use Seek\Entities\AdvertisementPreview;
+
 
 /**
  * Listing end point
@@ -130,6 +132,29 @@ class Advertisement extends ApiAbstract
             ',
             [
                 'id' => $profileId
+            ]
+        )['data'];
+    }
+
+    /**
+     * @param AdvertisementPreview $advertisementPreview
+     * @return array
+     * @throws \Seek\Exceptions\InvalidArgumentException
+     */
+    public function getPositionPreviewUrl(AdvertisementPreview $advertisementPreview)
+    {
+        return $this->query(
+            '
+                query ($positionProfile: PostedPositionProfilePreview_PositionProfileInput!) {
+                  postedPositionProfilePreview(positionProfile: $positionProfile) {
+                    previewUri {
+                      url
+                    }
+                  }
+                }
+            ',
+            [
+                'positionProfile' => $advertisementPreview->getArray()
             ]
         )['data'];
     }
