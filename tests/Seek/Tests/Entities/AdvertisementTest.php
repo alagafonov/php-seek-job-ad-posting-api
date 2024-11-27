@@ -19,16 +19,6 @@ class AdvertisementTest extends SeekTestCase
         $this->assertEquals($data['thirdParties']['agentId'], $thirdParties->getAgentId());
     }
 
-    public function testSetAdvertisementType()
-    {
-        $data = $this->getAdvertisementData();
-        $advertisement = $this->createAdvertisement($data);
-        $advertisementType = $advertisement->getAdvertisementType();
-
-        $this->assertInstanceOf('Seek\Enums\AdvertisementType', $advertisementType);
-        $this->assertEquals($data['advertisementType'], $advertisementType->getValue());
-    }
-
     public function testSetLocation()
     {
         $data = $this->getAdvertisementData();

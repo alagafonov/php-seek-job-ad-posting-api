@@ -2,7 +2,6 @@
 
 use Seek\Entities\Advertisement;
 use Seek\Entities\AdvertisementPreview;
-use Seek\Enums\AdvertisementType;
 use Seek\Enums\Position;
 use Seek\Enums\PositionStatus;
 use Seek\Enums\SalaryType;
@@ -54,6 +53,27 @@ class AdvertisementFactory extends AbstractEntityFactory
     ];
 
     /**
+     * @var array
+     */
+    private static $previewMappings = [
+        'jobCategories'       => [
+            'function' => 'setSubClassification',
+        ],
+        'positionLocation'  => [
+            'function' => 'setLocation',
+        ],
+        'jobSummary'  => [
+            'function' => 'setJobSummary',
+        ],
+        'advertisementDetails'  => [
+            'function' => 'setAdvertisementDetails',
+        ],
+        'brandingId'  => [
+            'function' => 'setBrandingId',
+        ],
+    ];
+
+    /**
      * @param array $data
      * @return Advertisement
      * @throws InvalidArgumentException
@@ -64,7 +84,7 @@ class AdvertisementFactory extends AbstractEntityFactory
             $data['creationId'],
             $data['hirerId'],
             PositionStatus::get($data['positionStatus']),
-            AdvertisementType::get($data['advertisementType']),
+            $data['advertisementProductId'],
             $data['jobTitle'],
             $data['location'],
             $data['subclassificationId'],
@@ -132,22 +152,24 @@ class AdvertisementFactory extends AbstractEntityFactory
             $data['hirerId'],
             $data['jobTitle'],
             WorkType::get($data['workType']),
-            AdvertisementType::get($data['advertisementType'])
+            $data['advertisementProductId']
         );
-        /*self::populateEntity($advertisement, $data, self::$mappings);
+        self::populateEntity($advertisementPreview, $data, self::$previewMappings);
 
-        if (!empty($data['contact'])) {
-            $advertisement->setContact(
-                new Contact(
-                    $data['contact']['name'],
-                    !empty($data['contact']['phone']) ? $data['contact']['phone'] : null,
-                    !empty($data['contact']['email']) ? $data['contact']['email'] : null
+        if (!empty($data['salary'])) {
+            $advertisementPreview->setSalary(
+                new Salary(
+                    SalaryType::get($data['salary']['type']),
+                    $data['salary']['minimum'],
+                    $data['salary']['maximum'],
+                    !empty($data['salary']['details']) ? $data['salary']['details'] : '',
+                    !empty($data['salary']['currency']) ? $data['salary']['currency'] : 'AUD'
                 )
             );
         }
 
         if (!empty($data['video'])) {
-            $advertisement->setVideo(
+            $advertisementPreview->setVideo(
                 new Video(
                     $data['video']['url'],
                     !empty($data['video']['position']) ? Position::get($data['video']['position']) : null
@@ -156,16 +178,16 @@ class AdvertisementFactory extends AbstractEntityFactory
         }
 
         if (!empty($data['searchBulletPoint1'])) {
-            $advertisement->setSearchBulletPoint(1, $data['searchBulletPoint1']);
+            $advertisementPreview->setSearchBulletPoint(1, $data['searchBulletPoint1']);
         }
 
         if (!empty($data['searchBulletPoint2'])) {
-            $advertisement->setSearchBulletPoint(2, $data['searchBulletPoint2']);
+            $advertisementPreview->setSearchBulletPoint(2, $data['searchBulletPoint2']);
         }
 
         if (!empty($data['searchBulletPoint3'])) {
-            $advertisement->setSearchBulletPoint(3, $data['searchBulletPoint3']);
-        }*/
+            $advertisementPreview->setSearchBulletPoint(3, $data['searchBulletPoint3']);
+        }
 
         return $advertisementPreview;
     }

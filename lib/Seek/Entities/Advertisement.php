@@ -2,7 +2,6 @@
 
 use DateTime;
 use Seek\Enums\AdvertisementState;
-use Seek\Enums\AdvertisementType;
 use Seek\Enums\PositionStatus;
 use Seek\Enums\WorkType;
 use Seek\Exceptions\InvalidArgumentException;
@@ -41,11 +40,6 @@ class Advertisement extends Entity
      * @var PositionStatus
      */
     protected $positionStatus;
-
-    /**
-     * @var AdvertisementType
-     */
-    protected $advertisementType;
 
     /**
      * Defines the title of the job role or occupation which is shown to job seekers [limited to 80 characters]. No
@@ -174,7 +168,7 @@ class Advertisement extends Entity
      * @param string $creationId
      * @param string $hirerId
      * @param PositionStatus $positionStatus
-     * @param AdvertisementType $advertisementType
+     * @param string $advertisementProductId
      * @param string $jobTitle
      * @param string $location
      * @param string $subClassification
@@ -189,7 +183,7 @@ class Advertisement extends Entity
         $creationId,
         $hirerId,
         PositionStatus $positionStatus,
-        AdvertisementType $advertisementType,
+        $advertisementProductId,
         $jobTitle,
         $location,
         $subClassification,
@@ -202,7 +196,7 @@ class Advertisement extends Entity
         $this->setCreationId($creationId);
         $this->setHirerId($hirerId);
         $this->setPositionStatus($positionStatus);
-        $this->setAdvertisementType($advertisementType);
+        $this->setAdvertisementProductId($advertisementProductId);
         $this->setJobTitle($jobTitle);
         $this->setLocation($location);
         $this->setSubClassification($subClassification);
@@ -254,19 +248,22 @@ class Advertisement extends Entity
     }
 
     /**
-     * @param AdvertisementType $advertisementType
+     * @param string $advertisementProductId
      */
-    public function setAdvertisementType(AdvertisementType $advertisementType)
+    public function setAdvertisementProductId($advertisementProductId)
     {
-        $this->advertisementType = $advertisementType;
+        if (!is_string($advertisementProductId)) {
+            throw new InvalidArgumentException('Advertisement product id must be a string');
+        }
+        $this->advertisementProductId = $advertisementProductId;
     }
 
     /**
-     * @return AdvertisementType
+     * @return string
      */
-    public function getAdvertisementType()
+    public function getAdvertisementProductId()
     {
-        return $this->advertisementType;
+        return $this->advertisementProductId;
     }
 
     /**
@@ -752,7 +749,7 @@ class Advertisement extends Entity
             'positionOrganizations'         => [$this->getHirerId()],
             'positionTitle'                 => $this->getJobTitle(),
             'postingInstructions'           => [
-                'seekAnzAdvertisementType' => $this->getAdvertisementType()->getValue(),
+                'seekAdvertisementProductId' => $this->getAdvertisementProductId(),
                 'brandingId'               => $this->getBrandingId(),
             ],
             'seekAnzWorkTypeCode'           => $this->getWorkType()->getValue(),

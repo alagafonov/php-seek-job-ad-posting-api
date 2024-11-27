@@ -1,13 +1,8 @@
 <?php namespace Seek\Entities;
 
-use DateTime;
-use Seek\Enums\AdvertisementState;
-use Seek\Enums\AdvertisementType;
 use Seek\Enums\PositionStatus;
 use Seek\Enums\WorkType;
 use Seek\Exceptions\InvalidArgumentException;
-use Seek\ValueObjects\Contact;
-use Seek\ValueObjects\Recruiter;
 use Seek\ValueObjects\Salary;
 use Seek\ValueObjects\Video;
 
@@ -27,11 +22,6 @@ class AdvertisementPreview extends Entity
      * @var PositionStatus
      */
     protected $positionStatus;
-
-    /**
-     * @var AdvertisementType
-     */
-    protected $advertisementType;
 
     /**
      * Defines the title of the job role or occupation which is shown to job seekers [limited to 80 characters]. No
@@ -54,6 +44,13 @@ class AdvertisementPreview extends Entity
      * @var string
      */
     protected $brandingId;
+
+    /**
+     * Identifies advertisement product id.
+     *
+     * @var string
+     */
+    protected $advertisementProductId;
 
     /**
      * @var string
@@ -89,11 +86,6 @@ class AdvertisementPreview extends Entity
     protected $advertisementDetails;
 
     /**
-     * @var Contact
-     */
-    protected $contact = null;
-
-    /**
      * An optional video related to the job and its postition within the advertisement. Provided link must be secure
      * (HTTPS) to be accepted
      *
@@ -102,57 +94,27 @@ class AdvertisementPreview extends Entity
     protected $video = null;
 
     /**
-     * The URL of the Job Application Form if not on SEEK [limited to 500 characters].
-     *
-     * @var string
-     */
-    protected $applicationFormUrl = null;
-
-    /**
-     * @var Recruiter
-     */
-    protected $recruiter = null;
-
-    /**
-     * @var DateTime
-     */
-    protected $expiryDate = null;
-
-    /**
-     * @var AdvertisementState
-     */
-    protected $state = null;
-
-    /**
      * @var array
      */
     protected $searchBulletPoints = [];
 
     /**
-     * @param string $creationId
      * @param string $hirerId
-     * @param PositionStatus $positionStatus
-     * @param AdvertisementType $advertisementType
      * @param string $jobTitle
-     * @param string $location
-     * @param string $subClassification
      * @param WorkType $workType
-     * @param Salary $salary
-     * @param string $jobSummary
-     * @param string $advertisementDetails
-     * @param Recruiter $recruiter
+     * @param string $advertisementProductId
      * @throws InvalidArgumentException
      */
     public function __construct(
         $hirerId,
         $jobTitle,
         WorkType $workType,
-        AdvertisementType $advertisementType
+        $advertisementProductId
     ) {
         $this->setHirerId($hirerId);
         $this->setJobTitle($jobTitle);
         $this->setWorkType($workType);
-        $this->setAdvertisementType($advertisementType);
+        $this->setAdvertisementProductId($advertisementProductId);
     }
 
     /**
@@ -177,38 +139,6 @@ class AdvertisementPreview extends Entity
     public function getHirerId()
     {
         return $this->hirerId;
-    }
-
-    /**
-     * @param PositionStatus $positionStatus
-     */
-    public function setPositionStatus(PositionStatus $positionStatus)
-    {
-        $this->positionStatus = $positionStatus;
-    }
-
-    /**
-     * @return PositionStatus
-     */
-    public function getPositionStatus()
-    {
-        return $this->positionStatus;
-    }
-
-    /**
-     * @param AdvertisementType $advertisementType
-     */
-    public function setAdvertisementType(AdvertisementType $advertisementType)
-    {
-        $this->advertisementType = $advertisementType;
-    }
-
-    /**
-     * @return AdvertisementType
-     */
-    public function getAdvertisementType()
-    {
-        return $this->advertisementType;
     }
 
     /**
@@ -374,6 +304,26 @@ class AdvertisementPreview extends Entity
     }
 
     /**
+     * @param string $advertisementProductId
+     * @throws InvalidArgumentException
+     */
+    public function setAdvertisementProductId($advertisementProductId)
+    {
+        if (!is_string($advertisementProductId)) {
+            throw new InvalidArgumentException('Advertisement id must be a string');
+        }
+        $this->advertisementProductId = $advertisementProductId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAdvertisementProductId()
+    {
+        return $this->advertisementProductId;
+    }
+
+    /**
      * @param string $subClassification
      * @throws InvalidArgumentException
      */
@@ -429,22 +379,6 @@ class AdvertisementPreview extends Entity
     }
 
     /**
-     * @param Contact $contact
-     */
-    public function setContact(Contact $contact)
-    {
-        $this->contact = $contact;
-    }
-
-    /**
-     * @return Contact
-     */
-    public function getContact()
-    {
-        return $this->contact;
-    }
-
-    /**
      * @param Video $video
      */
     public function setVideo(Video $video)
@@ -461,22 +395,6 @@ class AdvertisementPreview extends Entity
     }
 
     /**
-     * @param AdvertisementState $advertisementState
-     */
-    public function setState(AdvertisementState $advertisementState = null)
-    {
-        $this->state = $advertisementState;
-    }
-
-    /**
-     * @return AdvertisementState
-     */
-    public function getState()
-    {
-        return $this->state;
-    }
-
-    /**
      * @param bool $includeOpening
      * @return array[]
      * @throws InvalidArgumentException
@@ -486,39 +404,61 @@ class AdvertisementPreview extends Entity
         $positionProfile = [
             'positionTitle'                 => $this->getJobTitle(),
             'positionOrganizations'         => $this->getHirerId(),
-            //'jobCategories'                 => [$this->getSubClassification()],
-            //'positionLocation'              => [$this->getLocation()],
-            //'offeredRemunerationPackage'    => $this->getSalary()->getArray(),
             'postingInstructions'           => [
-                'seekAnzAdvertisementType' => $this->getAdvertisementType()->getValue(),
+                'seekAdvertisementProductId' => $this->getAdvertisementProductId(),
                 'brandingId'               => $this->getBrandingId(),
             ],
-            /*'positionFormattedDescriptions' => [
-                [
-                    'descriptionId' => 'SearchSummary',
-                    'content'       => $this->getJobSummary(),
-                ],
-                [
-                    'descriptionId' => 'AdvertisementDetails',
-                    'content'       => $this->getAdvertisementDetails(),
-                ],
-            ],*/
-            'seekAnzWorkTypeCode'           => $this->getWorkType()->getValue(),
-            //'seekBillingReference'          => $this->getBillingReference(),
+            'seekAnzWorkTypeCode'           => $this->getWorkType()->getValue()
         ];
-        $video = $this->getVideo();
-        if ($video !== null) {
-            $positionProfile['seekVideo'] = $video->getArray();
+        $subClassification = $this->getSubClassification();
+        if ($subClassification) {
+            $positionProfile['jobCategories'] = $subClassification;
+        }
+        $location = $this->getLocation();
+        if ($location) {
+            $positionProfile['positionLocation'] = $location;
+        }
+        $salary = $this->getSalary();
+        if ($salary !== null) {
+            $positionProfile['offeredRemunerationPackage'] = $salary->getArray();
+        }
+        $jobSummary = $this->getJobSummary();
+        if ($jobSummary) {
+            if (!isset($positionProfile['positionFormattedDescriptions'])) {
+                $positionProfile['positionFormattedDescriptions'] = [];
+            }
+            $positionProfile['positionFormattedDescriptions'][] = [
+                'descriptionId' => 'SearchSummary',
+                'content'       => $jobSummary,
+            ];
+        }
+        $advertisementDetails = $this->getAdvertisementDetails();
+        if ($advertisementDetails) {
+            if (!isset($positionProfile['positionFormattedDescriptions'])) {
+                $positionProfile['positionFormattedDescriptions'] = [];
+            }
+            $positionProfile['positionFormattedDescriptions'][] = [
+                'descriptionId' => 'AdvertisementDetails',
+                'content'       => $advertisementDetails,
+            ];
         }
         for ($i = 1; $i < 4; $i++) {
             $searchBulletPoint = $this->getSearchBulletPoint($i);
             if ($searchBulletPoint) {
+                if (!isset($positionProfile['positionFormattedDescriptions'])) {
+                    $positionProfile['positionFormattedDescriptions'] = [];
+                }
                 $positionProfile['positionFormattedDescriptions'][] = [
                     'descriptionId' => 'SearchBulletPoint',
                     'content'       => $searchBulletPoint,
                 ];
             }
         }
+        $video = $this->getVideo();
+        if ($video !== null) {
+            $positionProfile['seekVideo'] = $video->getArray();
+        }
+
         return $positionProfile;
     }
 }
