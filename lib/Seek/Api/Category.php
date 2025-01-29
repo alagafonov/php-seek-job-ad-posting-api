@@ -90,4 +90,45 @@ class Category extends ApiAbstract
             return CategoryFactory::createCategoryRelationshipListFromArray($result['jobCategories']);
         }
     }
+
+    /**
+     * @param string $schemeId
+     * @return array|\Seek\Entities\CategoryRelationship
+     * @throws \Seek\Exceptions\InvalidArgumentException
+     */
+    public function getAllByLocation($schemeId, $location)
+    {
+        $result = $this->query(
+            '
+                query (
+                    $schemeId: String!
+                    $positionProfile: JobCategories_PositionProfileInput!
+                ) {
+                  jobCategories(
+                    schemeId: $schemeId
+                    positionProfile: $positionProfile
+                  ) {
+                    id {
+                      value
+                    }
+                    name
+                    children {
+                      id {
+                        value
+                      }
+                      name
+                    }
+                  }
+                }
+            ',
+            [
+                'schemeId'        => $schemeId,
+                'positionProfile' => ['positionLocation' => $location],
+            ]
+        )['data'];
+
+        if (!empty($result['jobCategories'])) {
+            return CategoryFactory::createCategoryRelationshipListFromArray($result['jobCategories']);
+        }
+    }
 }

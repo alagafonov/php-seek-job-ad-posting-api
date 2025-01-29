@@ -71,6 +71,9 @@ class AdvertisementFactory extends AbstractEntityFactory
         'brandingId'  => [
             'function' => 'setBrandingId',
         ],
+        'profileId'  => [
+            'function' => 'setProfileId',
+        ],
     ];
 
     /**

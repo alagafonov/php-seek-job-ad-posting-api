@@ -142,6 +142,30 @@ class AdvertisementPreview extends Entity
     }
 
     /**
+     * @param string $profileId
+     * @throws InvalidArgumentException
+     */
+    public function setProfileId($profileId)
+    {
+        if (!is_string($profileId)) {
+            throw new InvalidArgumentException('Profile id must be a string');
+        }
+
+        if (!$profileId) {
+            throw new InvalidArgumentException('Profile id cannot be empty');
+        }
+        $this->profileId = $profileId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProfileId()
+    {
+        return $this->profileId;
+    }
+
+    /**
      * @param string $location
      * @throws InvalidArgumentException
      */
@@ -410,6 +434,10 @@ class AdvertisementPreview extends Entity
             ],
             'seekAnzWorkTypeCode'           => $this->getWorkType()->getValue()
         ];
+        $profileId = $this->getProfileId();
+        if ($profileId) {
+            $positionProfile['profileId'] = $profileId;
+        }
         $subClassification = $this->getSubClassification();
         if ($subClassification) {
             $positionProfile['jobCategories'] = $subClassification;
