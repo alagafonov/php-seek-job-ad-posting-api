@@ -39,6 +39,7 @@ class Applicant extends ApiAbstract
                         name {
                           given
                           family
+                          formattedName
                         }
                         communication {
                           phone {
@@ -46,6 +47,15 @@ class Applicant extends ApiAbstract
                           }
                           email {
                             address
+                          }
+                          address {
+                            city
+                            postalCode
+                            countryCode
+                            countrySubDivisions {
+                              type
+                              value
+                            }
                           }
                         }
                       }
@@ -86,7 +96,30 @@ class Applicant extends ApiAbstract
                         validTo
                       }
                     }
+                    positionPreferences {
+                      locations {
+                        referenceLocation {
+                          city
+                          postalCode
+                          countryCode
+                          countrySubDivisions {
+                            type
+                            value
+                          }
+                        }
+                      }
+                      seekAnzWorkTypeCodes
+                      seekSalaryExpectations {
+                        amount {
+                          currency
+                          value
+                        }
+                        countryCode
+                        intervalCode
+                      }
+                    }
                     attachments {
+                      descriptions
                       seekRoleCode
                       url
                     }

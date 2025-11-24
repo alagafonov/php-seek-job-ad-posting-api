@@ -24,6 +24,7 @@ use Seek\Token\Store\StoreInterface as TokenStoreInterface;
  * @method Api\Branding branding()
  * @method Api\Advertisement advertisement()
  * @method Api\Applicant applicant()
+ * @method Api\ApplyWithSeek applyWithSeek()
  *
  * Website: https://github.com/alagafonov/php-seek-job-ad-posting-api
  */
@@ -137,6 +138,9 @@ class Client
                 break;
             case 'applicant':
                 $api = new Api\Applicant($this);
+                break;
+            case 'applyWithSeek':
+                $api = new Api\ApplyWithSeek($this);
                 break;
             default:
                 throw new UnknownMethodException('Undefined end point instance called: "' . $name . '"');
